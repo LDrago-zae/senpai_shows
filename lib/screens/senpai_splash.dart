@@ -18,10 +18,9 @@ class SenpaiSplashState extends State<SenpaiSplash>
   void initState() {
     super.initState();
 
-    // Initialize the animation controller and animations
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
 
     _opacityAnimation = Tween<double>(
@@ -34,7 +33,8 @@ class SenpaiSplashState extends State<SenpaiSplash>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
-    _controller.forward(); // Start the animation
+    _controller.forward(); // Start animations only
+    // Removed auto-navigation logic
   }
 
   @override
@@ -50,16 +50,16 @@ class SenpaiSplashState extends State<SenpaiSplash>
         children: [
           // Background image with dark overlay
           Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/senpaiAssets/fr.png"),
                 fit: BoxFit.cover,
               ),
             ),
             child: Container(
-              color: Colors.black.withValues(alpha: 0.2), // Dark overlay
+              color: Colors.black.withOpacity(0.4),
             ),
           ),
 
@@ -81,42 +81,63 @@ class SenpaiSplashState extends State<SenpaiSplash>
                 children: [
                   Image.asset(
                     "assets/senpaiAssets/logo4.png",
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    height: MediaQuery.of(context).size.width * 0.6,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.width * 0.8,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: MaterialButton(
+
+          // Get Started Button
+          Padding(
+            padding: const EdgeInsets.only(bottom: 60.0),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _opacityAnimation.value,
+                    child: Transform.translate(
+                      offset: Offset(0, 20 * (1 - _opacityAnimation.value)),
+                      child: child,
+                    ),
+                  );
+                },
+                child: ElevatedButton(
                   onPressed: () {
+                    // Navigation happens ONLY when button is pressed
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SenpaiLogin()),
+                      MaterialPageRoute(builder: (context) => const SenpaiLogin()),
                     );
                   },
-                  animationDuration: Duration(seconds: 2),
-                  minWidth: MediaQuery.of(context).size.width * 0.4,
-                  height: 40,
-                  color: Color(0xff01968B),
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.greenAccent, width: 1),
-                    borderRadius: BorderRadius.circular(10),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4ECDC4),
+                    foregroundColor: Colors.white,
+                    minimumSize: Size(MediaQuery.of(context).size.width * 0.6, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(
+                        color: Color(0xFF44B7B8),
+                        width: 1,
+                      ),
+                    ),
+                    elevation: 4,
+                    shadowColor: const Color(0xFF4ECDC4).withOpacity(0.5),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Get Started',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-            ],
+            ),
           ),
         ],
       ),

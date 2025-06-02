@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:senpai_shows/screens/senpai_login.dart';
 
 class SenpaiSplash extends StatefulWidget {
+  const SenpaiSplash({super.key});
+
   @override
-  _SenpaiSplashState createState() => _SenpaiSplashState();
+  SenpaiSplashState createState() => SenpaiSplashState();
 }
 
-class _SenpaiSplashState extends State<SenpaiSplash> with SingleTickerProviderStateMixin {
+class SenpaiSplashState extends State<SenpaiSplash>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;
@@ -14,18 +18,21 @@ class _SenpaiSplashState extends State<SenpaiSplash> with SingleTickerProviderSt
   void initState() {
     super.initState();
 
+    // Initialize the animation controller and animations
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
     );
 
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _scaleAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.6,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _controller.forward(); // Start the animation
   }
@@ -52,7 +59,7 @@ class _SenpaiSplashState extends State<SenpaiSplash> with SingleTickerProviderSt
               ),
             ),
             child: Container(
-              color: Colors.black.withOpacity(0.8), // Dark overlay
+              color: Colors.black.withValues(alpha: 0.2), // Dark overlay
             ),
           ),
 
@@ -81,6 +88,35 @@ class _SenpaiSplashState extends State<SenpaiSplash> with SingleTickerProviderSt
                 ],
               ),
             ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: MaterialButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SenpaiLogin()),
+                    );
+                  },
+                  animationDuration: Duration(seconds: 2),
+                  minWidth: MediaQuery.of(context).size.width * 0.4,
+                  height: 40,
+                  color: Color(0xff01968B),
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.greenAccent, width: 1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'Get Started',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+            ],
           ),
         ],
       ),

@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:senpai_shows/firebase/senpai_auth.dart'; // Import SenpaiAuth
 import 'package:senpai_shows/screens/senpai_signup.dart';
+// Import a screen to navigate to after successful login, e.g., a home screen
+// import 'senpai_home.dart'; // Example: replace with your actual home screen
 
 class SenpaiLogin extends StatefulWidget {
   const SenpaiLogin({super.key});
@@ -14,6 +17,55 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _obscurePassword = true;
+
+  final SenpaiAuth _auth = SenpaiAuth(); // Create an instance of SenpaiAuth
+  bool _isLoading = false; // To show a loading indicator
+
+  Future<void> _performLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final userCredential = await _auth.signInWithEmailPassword(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (userCredential != null && userCredential.user != null) {
+      // Login successful, navigate to home screen
+      if (mounted) {
+        // Replace with your actual home screen navigation
+        // For example, if you have a SenpaiHome screen:
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const SenpaiHome()),
+        // );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login successful!"),
+            shape:  RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: const Color(0xFF4ECDC4),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+        // For now, let's just pop if no home screen is defined
+        // Navigator.pop(context); // Or navigate to your main app screen
+      }
+    } else {
+      // Login failed, error is printed in SenpaiAuth class
+      // You can show a generic error message here
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login failed. Please check your credentials.")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,185 +107,190 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                         children: [
                           const SizedBox(height: 16), // Space after back button
 
-                          // Main content card
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFF4ECDC4).withOpacity(0.2),
-                                width: 1,
+                          // Welcome text
+                          const Text(
+                            'Welcome back!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Login to your account',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Email field
+                          TextField(
+                            controller: _emailController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              hintText: 'Email or username',
+                              hintStyle: TextStyle(
+                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 14,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.1),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.email_outlined,
+                                color: Colors.white.withOpacity(0.5),
                               ),
                             ),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'Welcome!',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Login to your account',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.8),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
+                          ),
+                          const SizedBox(height: 16),
 
-                                // Email field
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: TextField(
-                                    controller: _emailController,
-                                    style: const TextStyle(color: Colors.black),
-                                    decoration: const InputDecoration(
-                                      hintText: 'Email or username',
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 16,
-                                      ),
-                                    ),
-                                  ),
+                          // Password field
+                          TextField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              hintText: 'Password',
+                              hintStyle: TextStyle(
+                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 14,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.1),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.lock_outline,
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.white.withOpacity(0.5),
                                 ),
-                                const SizedBox(height: 16),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
 
-                                // Password field
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: TextField(
-                                    controller: _passwordController,
-                                    obscureText: _obscurePassword,
-                                    style: const TextStyle(color: Colors.black),
-                                    decoration: InputDecoration(
-                                      hintText: 'Password',
-                                      hintStyle: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                      border: InputBorder.none,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 16,
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _obscurePassword = !_obscurePassword;
-                                          });
-                                        },
-                                        icon: Icon(
-                                          _obscurePassword
-                                              ? Icons.visibility_off
-                                              : Icons.visibility,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                // Remember me and forgot password
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Transform.scale(
-                                          scale: 0.7,
-                                          child: Checkbox(
-                                            value: _rememberMe,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _rememberMe = value ?? false;
-                                              });
-                                            },
-                                            activeColor: const Color(0xFF4ECDC4),
-                                            checkColor: Colors.white,
-                                            side: const BorderSide(
-                                              color: Colors.white54,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          'Remember me',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.9),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Forgot password logic
-                                      },
-                                      child: Text(
-                                        'Forgot password?',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.9),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Login button
-                                Container(
-                                  width: double.infinity,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF4ECDC4),
-                                        Color(0xFF44B7B8)
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: MaterialButton(
-                                    onPressed: () {
-                                      // Login logic
+                          // Remember me and forgot password
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _rememberMe,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _rememberMe = value ?? false;
+                                      });
                                     },
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    activeColor: const Color(0xFF4ECDC4),
+                                    checkColor: Colors.white,
+                                    side: BorderSide(
+                                      color: Colors.white.withOpacity(0.5),
                                     ),
                                   ),
+                                  Text(
+                                    'Remember me',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // TextButton(
+                              //   onPressed: () {
+                              //     // Forgot password logic
+                              //     // You might want to implement a password reset feature here
+                              //     // using _auth.sendPasswordResetEmail(email)
+                              //     if (_emailController.text.trim().isNotEmpty) {
+                              //       _auth.sendPasswordResetEmail(_emailController.text.trim()).then((_) {
+                              //         ScaffoldMessenger.of(context).showSnackBar(
+                              //           SnackBar(content: Text("Password reset email sent to ${_emailController.text.trim()}")),
+                              //         );
+                              //       }).catchError((e) {
+                              //         ScaffoldMessenger.of(context).showSnackBar(
+                              //           SnackBar(content: Text("Failed to send reset email: ${e.message}")),
+                              //         );
+                              //       });
+                              //     } else {
+                              //       ScaffoldMessenger.of(context).showSnackBar(
+                              //         const SnackBar(content: Text("Please enter your email address to reset password.")),
+                              //       );
+                              //     }
+                              //   },
+                              //   child: Text(
+                              //     'Forgot password?',
+                              //     style: TextStyle(
+                              //       color: Colors.white.withOpacity(0.9),
+                              //       fontSize: 12,
+                              //     ),
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Login button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _performLogin, // Call _performLogin
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4ECDC4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                                  : const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 24),
 
                           // Sign up text
                           RichText(
@@ -247,7 +304,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 TextSpan(
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.push(
+                                      Navigator.pushReplacement( // Use pushReplacement if you don't want user to go back to login
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
@@ -316,7 +373,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                   // Google login logic
                                 },
                                 icon: const Icon(
-                                  Icons.g_mobiledata,
+                                  Icons.g_mobiledata, // Consider using a proper Google icon
                                   color: Color(0xFFDB4437),
                                   size: 40,
                                 ),

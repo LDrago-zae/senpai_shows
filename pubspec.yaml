@@ -36,10 +36,14 @@ dependencies:
   cloud_firestore: ^5.6.0
   flutter_svg: ^2.0.9
   google_sign_in: ^6.3.0
-  flutter_appauth: ^5.0.0  # PKCE OAuth flow
-  uni_links: ^0.5.1       # Handle deep links
+  flutter_appauth: ^5.0.0  # PKCE OAuth flow       # Handle deep links
   http: ^1.4.0
-  flutter_secure_storage: ^6.0.0
+  flutter_dotenv: ^5.1.0
+  uuid: ^3.0.7
+  oauth2: ^2.0.0
+  url_launcher: ^6.0.0
+  app_links: ^6.4.0
+
 
 dev_dependencies:
   flutter_test:

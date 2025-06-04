@@ -70,6 +70,49 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
     }
   }
 
+  bool _isMALLoading = false;
+
+  Future<void> _performAniListSignIn() async {
+    setState(() => _isMALLoading = true);
+
+    try {
+      final success = await _auth.loginWithAniList();
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("MyAnimeList login successful!"),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: const Color(0xFF4ECDC4),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("MyAnimeList login failed or was cancelled"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error with MyAnimeList login: $e"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isMALLoading = false);
+      }
+    }
+  }
+
   Future<void> _performGoogleSignIn() async {
     setState(() => _isGoogleLoading = true);
     final userCredential = await _auth.signInWithGoogle();
@@ -439,28 +482,30 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                   Column(
                                     children: [
                                       GestureDetector(
-                                        onTap: _isGoogleLoading ? null : () {
-                                          // Placeholder for MyAnimeList login
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text("MyAnimeList login not implemented."),
-                                            ),
-                                          );
-                                        },
-                                        child: Container(
+                                        onTap: _isMALLoading ? null : _performAniListSignIn,
+                                        child: SizedBox(
                                           width: 48,
                                           height: 48,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.blue.shade900,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: SvgPicture.asset(
-                                              'assets/icons/myanimelist1.svg',
-                                              colorFilter: const ColorFilter.mode(
-                                                Colors.white,
-                                                BlendMode.srcIn,
+                                          child: _isMALLoading
+                                              ? const CircularProgressIndicator(
+                                            color: Color(0xFF4ECDC4),
+                                            strokeWidth: 4,
+                                          )
+                                              : Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.blue.shade900,
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: SvgPicture.asset(
+                                                'assets/icons/myanimelist1.svg',
+                                                colorFilter: const ColorFilter.mode(
+                                                  Colors.white,
+                                                  BlendMode.srcIn,
+                                                ),
                                               ),
                                             ),
                                           ),

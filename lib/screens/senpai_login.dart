@@ -5,7 +5,7 @@ import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
 import 'package:senpai_shows/screens/senpai_signup.dart';
 import '../components/slide_animation.dart';
- // Hypothetical home screen
+// Hypothetical home screen
 
 class SenpaiLogin extends StatefulWidget {
   const SenpaiLogin({super.key});
@@ -19,6 +19,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _obscurePassword = true;
+  bool _isMALLoading = false;
 
   final SenpaiAuth _auth = SenpaiAuth();
   bool _isLoading = false;
@@ -60,6 +61,37 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _performAniListSignIn() async {
+    setState(() => _isMALLoading = true);
+    final success = await _auth.loginWithAniList();
+    setState(() => _isMALLoading = false);
+
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("MyAnimeList login successful!"),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: const Color(0xFF4ECDC4),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   SlideAnimation(
+      //     page: const SenpaiHomeScreen(),
+      //     direction: AxisDirection.right,
+      //   ),
+      // );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("MyAnimeList login failed or was cancelled"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
     }
   }
 
@@ -241,13 +273,17 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                       activeColor: const Color(0xFF4ECDC4),
                                       checkColor: Colors.white,
                                       side: BorderSide(
-                                        color: Colors.white.withValues(alpha: 0.5),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.5,
+                                        ),
                                       ),
                                     ),
                                     Text(
                                       'Remember me',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.9),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.9,
+                                        ),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -267,23 +303,24 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: _isLoading
-                                    ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                    : const Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                child:
+                                    _isLoading
+                                        ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                        : const Text(
+                                          'Login',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
                               ),
                             ),
                             const SizedBox(height: 24),
@@ -294,18 +331,21 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                   fontSize: 14,
                                 ),
                                 children: [
-                                  const TextSpan(text: "Don't have an account? "),
+                                  const TextSpan(
+                                    text: "Don't have an account? ",
+                                  ),
                                   TextSpan(
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.push(
-                                          context,
-                                          SlideAnimation(
-                                            page: const SenpaiSignup(),
-                                            direction: AxisDirection.left,
-                                          ),
-                                        );
-                                      },
+                                    recognizer:
+                                        TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Navigator.push(
+                                              context,
+                                              SlideAnimation(
+                                                page: const SenpaiSignup(),
+                                                direction: AxisDirection.left,
+                                              ),
+                                            );
+                                          },
                                     text: "Signup here",
                                     style: const TextStyle(
                                       color: Color(0xFF4ECDC4),
@@ -350,42 +390,58 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                   Column(
                                     children: [
                                       GestureDetector(
-                                        onTap: _isGoogleLoading ? null : () {
-                                          // Placeholder for MyAnimeList login
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text("MyAnimeList login not implemented."),
-                                            ),
-                                          );
-                                        },
+                                        onTap:
+                                            _isMALLoading
+                                                ? null
+                                                : _performAniListSignIn,
                                         child: SizedBox(
                                           width: 48,
                                           height: 48,
-                                          child: Container(
-                                            width: 48,
-                                            height: 48,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.blue.shade900,
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12.0),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/myanimelist1.svg',
-                                                colorFilter: const ColorFilter.mode(
-                                                  Colors.white,
-                                                  BlendMode.srcIn,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          child:
+                                              _isMALLoading
+                                                  ? const CircularProgressIndicator(
+                                                    color: Color(0xFF4ECDC4),
+                                                    strokeWidth: 4,
+                                                  )
+                                                  : Container(
+                                                    width: 48,
+                                                    height: 48,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color:
+                                                          Colors.blue.shade900,
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            8.0,
+                                                          ),
+                                                      child: Image.asset(
+                                                        'assets/icons/anilist.png',
+                                                        fit: BoxFit.fill,
+                                                        // color: Colors.white
+                                                        //     .withValues(
+                                                        //       alpha: 0.8,
+                                                        //     ),
+                                                      ),
+                                                      // child: SvgPicture.asset(
+                                                      //   'assets/icons/myanimelist1.svg',
+                                                      //   colorFilter: const ColorFilter.mode(
+                                                      //     Colors.white,
+                                                      //     BlendMode.srcIn,
+                                                      //   ),
+                                                      // ),
+                                                    ),
+                                                  ),
                                         ),
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
-                                        'MyAnimeList',
+                                        'AniList',
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.8),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -395,36 +451,47 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                   Column(
                                     children: [
                                       GestureDetector(
-                                        onTap: _isGoogleLoading ? null : _performGoogleSignIn,
+                                        onTap:
+                                            _isGoogleLoading
+                                                ? null
+                                                : _performGoogleSignIn,
                                         child: SizedBox(
                                           width: 48,
                                           height: 48,
-                                          child: _isGoogleLoading
-                                              ? const CircularProgressIndicator(
-                                            color: Color(0xFF4ECDC4),
-                                            strokeWidth: 4,
-                                          )
-                                              : Container(
-                                            width: 48,
-                                            height: 48,
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white,
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12.0),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/google.svg',
-                                              ),
-                                            ),
-                                          ),
+                                          child:
+                                              _isGoogleLoading
+                                                  ? const CircularProgressIndicator(
+                                                    color: Color(0xFF4ECDC4),
+                                                    strokeWidth: 4,
+                                                  )
+                                                  : Container(
+                                                    width: 48,
+                                                    height: 48,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.white,
+                                                        ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            8.0,
+                                                          ),
+                                                      child: SvgPicture.asset(
+                                                        'assets/icons/google.svg',
+                                                      ),
+                                                    ),
+                                                  ),
                                         ),
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
                                         'Google',
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.8),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
                                           fontSize: 12,
                                         ),
                                       ),

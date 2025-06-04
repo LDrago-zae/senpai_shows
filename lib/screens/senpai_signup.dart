@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
-import 'senpai_login.dart';
+import 'senpai_login.dart'; // Hypothetical home screen
+import '../components/slide_animation.dart';
 
 class SenpaiSignup extends StatefulWidget {
   const SenpaiSignup({super.key});
@@ -23,10 +24,13 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
 
   final SenpaiAuth _auth = SenpaiAuth();
   bool _isLoading = false;
+  bool _isGoogleLoading = false; // Separate loading state for Google Sign-In
 
   Future<void> _performSignUp() async {
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Passwords do not match!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match!")),
+      );
       return;
     }
 
@@ -37,24 +41,21 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isLoading = true);
     final userCredential = await _auth.signUpWithEmailPassword(
       _emailController.text.trim(),
       _passwordController.text.trim(),
     );
-
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() => _isLoading = false);
 
     if (userCredential != null && userCredential.user != null) {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const SenpaiLogin()),
+          SlideAnimation(
+            page: const SenpaiLogin(),
+            direction: AxisDirection.right,
+          ),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Signup successful! Please login.")),
@@ -64,6 +65,47 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Signup failed. Please try again.")),
+        );
+      }
+    }
+  }
+
+  Future<void> _performGoogleSignIn() async {
+    setState(() => _isGoogleLoading = true);
+    final userCredential = await _auth.signInWithGoogle();
+    setState(() => _isGoogleLoading = false);
+
+    if (userCredential != null && userCredential.user != null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Welcome, ${userCredential.user!.displayName}!"),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: const Color(0xFF4ECDC4),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   SlideAnimation(
+        //     page: const SenpaiHomeScreen(),
+        //     direction: AxisDirection.right,
+        //   ),
+        // );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Google Sign-In cancelled by user."),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: Colors.redAccent,
+            duration: const Duration(seconds: 1),
+          ),
         );
       }
     }
@@ -119,7 +161,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                             Text(
                               'Join us today',
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: .8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                               ),
                             ),
@@ -347,7 +389,10 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                       ..onTap = () {
                                         Navigator.pushReplacement(
                                           context,
-                                          MaterialPageRoute(builder: (context) => const SenpaiLogin()),
+                                          SlideAnimation(
+                                            page: const SenpaiLogin(),
+                                            direction: AxisDirection.right,
+                                          ),
                                         );
                                       },
                                     text: "Login here",
@@ -365,7 +410,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 const Expanded(
                                   child: Divider(
                                     color: Colors.white54,
-                                    thickness: .5,
+                                    thickness: 0.5,
                                     endIndent: 8,
                                   ),
                                 ),
@@ -379,7 +424,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 const Expanded(
                                   child: Divider(
                                     color: Colors.white54,
-                                    thickness: .5,
+                                    thickness: 0.5,
                                     indent: 8,
                                   ),
                                 ),
@@ -394,7 +439,14 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                   Column(
                                     children: [
                                       GestureDetector(
-                                        onTap: () {},
+                                        onTap: _isGoogleLoading ? null : () {
+                                          // Placeholder for MyAnimeList login
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text("MyAnimeList login not implemented."),
+                                            ),
+                                          );
+                                        },
                                         child: Container(
                                           width: 48,
                                           height: 48,
@@ -402,17 +454,14 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                             shape: BoxShape.circle,
                                             color: Colors.blue.shade900,
                                           ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              // MyAnimeList login logic
-                                            },
-                                            icon: SvgPicture.asset(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: SvgPicture.asset(
                                               'assets/icons/myanimelist1.svg',
-                                              colorFilter: ColorFilter.mode(
+                                              colorFilter: const ColorFilter.mode(
                                                 Colors.white,
                                                 BlendMode.srcIn,
                                               ),
-                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
@@ -431,21 +480,27 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                   Column(
                                     children: [
                                       GestureDetector(
-                                        onTap: () {},
-                                        child: Container(
+                                        onTap: _isGoogleLoading ? null : _performGoogleSignIn,
+                                        child: SizedBox(
                                           width: 48,
                                           height: 48,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white,
-                                          ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              // Google login logic
-                                            },
-                                            icon: SvgPicture.asset(
-                                              'assets/icons/google.svg',
-                                              fit: BoxFit.fill,
+                                          child: _isGoogleLoading
+                                              ? const CircularProgressIndicator(
+                                            color: Color(0xFF4ECDC4),
+                                            strokeWidth: 2,
+                                          )
+                                              : Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: SvgPicture.asset(
+                                                'assets/icons/google.svg',
+                                              ),
                                             ),
                                           ),
                                         ),

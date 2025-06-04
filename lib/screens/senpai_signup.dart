@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
-import 'package:senpai_shows/firebase/senpai_auth.dart'; // Import SenpaiAuth
-import 'senpai_login.dart'; // Make sure to import your login screen
-// Import a screen to navigate to after successful signup, e.g., a home screen
-// import 'senpai_home.dart'; // Example: replace with your actual home screen
+import 'package:senpai_shows/firebase/senpai_auth.dart';
+import 'senpai_login.dart';
 
 class SenpaiSignup extends StatefulWidget {
   const SenpaiSignup({super.key});
@@ -22,15 +21,12 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  final SenpaiAuth _auth = SenpaiAuth(); // Create an instance of SenpaiAuth
-  bool _isLoading = false; // To show a loading indicator
+  final SenpaiAuth _auth = SenpaiAuth();
+  bool _isLoading = false;
 
   Future<void> _performSignUp() async {
     if (_passwordController.text != _confirmPasswordController.text) {
-      // Show error if passwords don't match
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match!")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Passwords do not match!")));
       return;
     }
 
@@ -55,20 +51,16 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
     });
 
     if (userCredential != null && userCredential.user != null) {
-      // Signup successful, navigate to home or login screen
-      // For example, navigate to login screen:
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const SenpaiLogin()), // Or your home screen
+          MaterialPageRoute(builder: (context) => const SenpaiLogin()),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Signup successful! Please login.")),
         );
       }
     } else {
-      // Signup failed, error is printed in SenpaiAuth class
-      // You can show a generic error message here
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Signup failed. Please try again.")),
@@ -89,10 +81,9 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
           ),
         ),
         child: SafeArea(
-          child: GlassmorphicContainer(
+          child: CosmicGlassmorphicContainer(
             child: Column(
               children: [
-                // Back button
                 Padding(
                   padding: const EdgeInsets.only(left: 16.0, top: 8.0),
                   child: Align(
@@ -107,7 +98,6 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                     ),
                   ),
                 ),
-                // Centered content
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
@@ -117,8 +107,6 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const SizedBox(height: 16),
-            
-                            // Title text
                             const Text(
                               'Create Account',
                               style: TextStyle(
@@ -131,24 +119,22 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                             Text(
                               'Join us today',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: .8),
                                 fontSize: 14,
                               ),
                             ),
                             const SizedBox(height: 32),
-            
-                            // Name field
                             TextField(
                               controller: _nameController,
                               style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                 hintText: 'Full name',
                                 hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   fontSize: 14,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withValues(alpha: 0.1),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -159,13 +145,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ),
                                 prefixIcon: Icon(
                                   Icons.person_outline,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
-            
-                            // Email field
                             TextField(
                               controller: _emailController,
                               style: const TextStyle(color: Colors.white),
@@ -173,11 +157,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                               decoration: InputDecoration(
                                 hintText: 'Email address',
                                 hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   fontSize: 14,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withValues(alpha: 0.1),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -188,13 +172,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ),
                                 prefixIcon: Icon(
                                   Icons.email_outlined,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
-            
-                            // Password field
                             TextField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
@@ -202,11 +184,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                               decoration: InputDecoration(
                                 hintText: 'Password',
                                 hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   fontSize: 14,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withValues(alpha: 0.1),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -217,7 +199,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                                 suffixIcon: IconButton(
                                   onPressed: () {
@@ -229,14 +211,12 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                     _obscurePassword
                                         ? Icons.visibility_off
                                         : Icons.visibility,
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
-            
-                            // Confirm Password field
                             TextField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
@@ -244,11 +224,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                               decoration: InputDecoration(
                                 hintText: 'Confirm Password',
                                 hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   fontSize: 14,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withValues(alpha: 0.1),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -259,7 +239,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                                 suffixIcon: IconButton(
                                   onPressed: () {
@@ -271,14 +251,12 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                     _obscureConfirmPassword
                                         ? Icons.visibility_off
                                         : Icons.visibility,
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
-            
-                            // Terms checkbox
                             Row(
                               children: [
                                 Checkbox(
@@ -291,14 +269,14 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                   activeColor: const Color(0xFF4ECDC4),
                                   checkColor: Colors.white,
                                   side: BorderSide(
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 Expanded(
                                   child: RichText(
                                     text: TextSpan(
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
+                                        color: Colors.white.withValues(alpha: 0.9),
                                         fontSize: 12,
                                       ),
                                       children: [
@@ -325,15 +303,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                               ],
                             ),
                             const SizedBox(height: 24),
-            
-                            // Signup button
                             SizedBox(
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
-                                onPressed: _isLoading || !_agreeToTerms
-                                    ? null
-                                    : _performSignUp, // Call _performSignUp
+                                onPressed: _isLoading || !_agreeToTerms ? null : _performSignUp,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF4ECDC4),
                                   shape: RoundedRectangleBorder(
@@ -359,14 +333,11 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ),
                               ),
                             ),
-            
                             const SizedBox(height: 24),
-            
-                            // Login link
                             RichText(
                               text: TextSpan(
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                   fontSize: 14,
                                 ),
                                 children: [
@@ -376,9 +347,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                       ..onTap = () {
                                         Navigator.pushReplacement(
                                           context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const SenpaiLogin(),
-                                          ),
+                                          MaterialPageRoute(builder: (context) => const SenpaiLogin()),
                                         );
                                       },
                                     text: "Login here",
@@ -390,10 +359,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ],
                               ),
                             ),
-            
                             const SizedBox(height: 30),
-            
-                            // Or continue with divider
                             Row(
                               children: [
                                 const Expanded(
@@ -406,7 +372,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 Text(
                                   'Or continue with',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.7),
+                                    color: Colors.white.withValues(alpha: 0.7),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -419,35 +385,80 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 ),
                               ],
                             ),
-            
                             const SizedBox(height: 30),
-            
-                            // Social login buttons
                             Padding(
                               padding: const EdgeInsets.only(bottom: 40.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      // Facebook login logic
-                                    },
-                                    icon: const Icon(
-                                      Icons.facebook,
-                                      color: Color(0xFF1877F2),
-                                      size: 40,
-                                    ),
+                                  Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Container(
+                                          width: 48,
+                                          height: 48,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.blue.shade900,
+                                          ),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              // MyAnimeList login logic
+                                            },
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/myanimelist1.svg',
+                                              colorFilter: ColorFilter.mode(
+                                                Colors.white,
+                                                BlendMode.srcIn,
+                                              ),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'MyAnimeList',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.8),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 16),
-                                  IconButton(
-                                    onPressed: () {
-                                      // Google login logic
-                                    },
-                                    icon: const Icon(
-                                      Icons.g_mobiledata, // Consider using a proper Google icon
-                                      color: Color(0xFFDB4437),
-                                      size: 40,
-                                    ),
+                                  const SizedBox(width: 30),
+                                  Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Container(
+                                          width: 48,
+                                          height: 48,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                          ),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              // Google login logic
+                                            },
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/google.svg',
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Google',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.8),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

@@ -59,7 +59,7 @@ class SenpaiSplashState extends State<SenpaiSplash>
               ),
             ),
             child: Container(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha:0.4),
             ),
           ),
 
@@ -126,7 +126,7 @@ class SenpaiSplashState extends State<SenpaiSplash>
                       ),
                     ),
                     elevation: 4,
-                    shadowColor: const Color(0xFF4ECDC4).withOpacity(0.5),
+                    shadowColor: const Color(0xFF4ECDC4).withValues(alpha:0.5),
                   ),
                   child: const Text(
                     'Get Started',

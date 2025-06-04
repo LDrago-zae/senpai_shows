@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
 import 'package:senpai_shows/screens/senpai_signup.dart';
@@ -19,8 +20,8 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
 
-  final SenpaiAuth _auth = SenpaiAuth(); // Create an instance of SenpaiAuth
-  bool _isLoading = false; // To show a loading indicator
+  final SenpaiAuth _auth = SenpaiAuth();
+  bool _isLoading = false;
 
   Future<void> _performLogin() async {
     setState(() {
@@ -37,32 +38,24 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
     });
 
     if (userCredential != null && userCredential.user != null) {
-      // Login successful, navigate to home screen
       if (mounted) {
-        // Replace with your actual home screen navigation
-        // For example, if you have a SenpaiHome screen:
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const SenpaiHome()),
-        // );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login successful!"),
-            shape:  RoundedRectangleBorder(
+          SnackBar(
+            content: const Text("Login successful!"),
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             backgroundColor: const Color(0xFF4ECDC4),
             duration: const Duration(seconds: 1),
           ),
         );
-        // For now, let's just pop if no home screen is defined
-        // Navigator.pop(context); // Or navigate to your main app screen
       }
     } else {
-      // Login failed, error is printed in SenpaiAuth class
-      // You can show a generic error message here
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login failed. Please check your credentials.")),
+          const SnackBar(
+            content: Text("Login failed. Please check your credentials."),
+          ),
         );
       }
     }
@@ -80,16 +73,16 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
           ),
         ),
         child: SafeArea(
-          child: GlassmorphicContainer(
+          child: CosmicGlassmorphicContainer(
             child: Column(
               children: [
-                // Back button moved to the top
+                // Back button
                 Padding(
                   padding: const EdgeInsets.only(left: 16.0, top: 8.0),
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      onPressed: () => Navigator.pop(context), // Pop the current screen
+                      onPressed: () => Navigator.pop(context),
                       icon: const Icon(
                         Icons.arrow_back_ios,
                         color: Colors.white,
@@ -107,8 +100,8 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(height: 16), // Space after back button
-            
+                            const SizedBox(height: 16),
+
                             // Welcome text
                             const Text(
                               'Welcome back!',
@@ -122,12 +115,12 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                             Text(
                               'Login to your account',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 14,
                               ),
                             ),
                             const SizedBox(height: 32),
-            
+
                             // Email field
                             TextField(
                               controller: _emailController,
@@ -136,11 +129,11 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                               decoration: InputDecoration(
                                 hintText: 'Email or username',
                                 hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   fontSize: 14,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withValues(alpha: 0.1),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -151,12 +144,12 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 ),
                                 prefixIcon: Icon(
                                   Icons.email_outlined,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
-            
+
                             // Password field
                             TextField(
                               controller: _passwordController,
@@ -165,11 +158,11 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                               decoration: InputDecoration(
                                 hintText: 'Password',
                                 hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   fontSize: 14,
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withValues(alpha: 0.1),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide.none,
@@ -180,7 +173,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                                 suffixIcon: IconButton(
                                   onPressed: () {
@@ -192,13 +185,13 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                     _obscurePassword
                                         ? Icons.visibility_off
                                         : Icons.visibility,
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
-            
+
                             // Remember me and forgot password
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,58 +208,28 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                       activeColor: const Color(0xFF4ECDC4),
                                       checkColor: Colors.white,
                                       side: BorderSide(
-                                        color: Colors.white.withOpacity(0.5),
+                                        color: Colors.white.withValues(alpha: 0.5),
                                       ),
                                     ),
                                     Text(
                                       'Remember me',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
+                                        color: Colors.white.withValues(alpha: 0.9),
                                         fontSize: 12,
                                       ),
                                     ),
                                   ],
                                 ),
-                                // TextButton(
-                                //   onPressed: () {
-                                //     // Forgot password logic
-                                //     // You might want to implement a password reset feature here
-                                //     // using _auth.sendPasswordResetEmail(email)
-                                //     if (_emailController.text.trim().isNotEmpty) {
-                                //       _auth.sendPasswordResetEmail(_emailController.text.trim()).then((_) {
-                                //         ScaffoldMessenger.of(context).showSnackBar(
-                                //           SnackBar(content: Text("Password reset email sent to ${_emailController.text.trim()}")),
-                                //         );
-                                //       }).catchError((e) {
-                                //         ScaffoldMessenger.of(context).showSnackBar(
-                                //           SnackBar(content: Text("Failed to send reset email: ${e.message}")),
-                                //         );
-                                //       });
-                                //     } else {
-                                //       ScaffoldMessenger.of(context).showSnackBar(
-                                //         const SnackBar(content: Text("Please enter your email address to reset password.")),
-                                //       );
-                                //     }
-                                //   },
-                                //   child: Text(
-                                //     'Forgot password?',
-                                //     style: TextStyle(
-                                //       color: Colors.white.withOpacity(0.9),
-                                //       fontSize: 12,
-                                //     ),
-                                //   ),
-                                // ),
                               ],
                             ),
                             const SizedBox(height: 24),
-            
+
                             // Login button
                             SizedBox(
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
-                                onPressed: (){_isLoading ? null : _performLogin;
-                                  }, // Call _performLogin
+                                onPressed: _isLoading ? null : _performLogin,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF4ECDC4),
                                   shape: RoundedRectangleBorder(
@@ -292,14 +255,14 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 ),
                               ),
                             ),
-            
+
                             const SizedBox(height: 24),
-            
+
                             // Sign up text
                             RichText(
                               text: TextSpan(
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                   fontSize: 14,
                                 ),
                                 children: [
@@ -309,7 +272,10 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                       ..onTap = () {
                                         Navigator.push(
                                           context,
-                                          SlideAnimation(page: const SenpaiSignup(), direction: AxisDirection.left),
+                                          SlideAnimation(
+                                            page: const SenpaiSignup(),
+                                            direction: AxisDirection.left,
+                                          ),
                                         );
                                       },
                                     text: "Signup here",
@@ -321,9 +287,9 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 ],
                               ),
                             ),
-            
+
                             const SizedBox(height: 30),
-            
+
                             // Or continue with divider
                             Row(
                               children: [
@@ -337,7 +303,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 Text(
                                   'Or continue with',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.7),
+                                    color: Colors.white.withValues(alpha: 0.7),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -350,35 +316,88 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 ),
                               ],
                             ),
-            
-                            const SizedBox(height: 20),
-            
-                            // Social login buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    // Facebook login logic
-                                  },
-                                  icon: const Icon(
-                                    Icons.facebook,
-                                    color: Color(0xFF1877F2),
-                                    size: 40,
+
+                            const SizedBox(height: 30),
+
+                            // Social login buttons with text beneath
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 40.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // MAL Login
+                                  Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          // MAL login logic
+                                        },
+                                        child: Container(
+                                          width: 48,
+                                          height: 48,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.blue.shade900,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/myanimelist1.svg',
+                                              colorFilter: const ColorFilter.mode(
+                                                Colors.white,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        'MyAnimeList',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.8),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 16),
-                                IconButton(
-                                  onPressed: () {
-                                    // Google login logic
-                                  },
-                                  icon: const Icon(
-                                    Icons.g_mobiledata, // Consider using a proper Google icon
-                                    color: Color(0xFFDB4437),
-                                    size: 40,
+
+                                  const SizedBox(width: 24),
+
+                                  // Google Login
+                                  Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          // Google login logic
+                                        },
+                                        child: Container(
+                                          width: 48,
+                                          height: 48,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/google.svg',
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        'Google',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.8),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -401,3 +420,4 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
     super.dispose();
   }
 }
+

@@ -9,8 +9,8 @@ class SlideAnimation extends PageRouteBuilder {
     required this.page,
     this.direction = AxisDirection.right,
   }) : super(
-    transitionDuration: const Duration(milliseconds: 800),
-    reverseTransitionDuration: const Duration(milliseconds: 500),
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) => page,
   );
 

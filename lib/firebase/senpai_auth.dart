@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SenpaiAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -36,9 +37,51 @@ class SenpaiAuth {
     }
   }
 
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      // 1. Trigger the Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        // User canceled the sign-in
+        return null;
+      }
+
+      // 2. Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
+
+      // 3. Create a new credential using the Google auth tokens
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // 4. Sign in to Firebase with the Google credentials
+      final UserCredential userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      return userCredential;
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      return null;
+    }
+  }
+
   // Example: Sign out
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
+  }
+
+  void signIn() async {
+    final userCredential = await signInWithGoogle();
+    if (userCredential != null) {
+      // Successfully signed in
+      print('User: ${userCredential.user?.displayName}');
+    } else {
+      // Sign in failed or was canceled
+      print('Sign in failed');
+    }
   }
 
 }

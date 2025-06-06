@@ -45,9 +45,11 @@ class CustomBottomNav extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _navIcon('assets/icons/home.png', 0, constraints.maxWidth),
-                  _navIcon('assets/icons/Bookmark.png', 1, constraints.maxWidth),
-                  _navIcon('assets/icons/Download.png', 2, constraints.maxWidth),
-                  _navIcon('assets/icons/user.png', 3, constraints.maxWidth),
+                  _navIcon('assets/icons/search.png', 1, constraints.maxWidth),
+                  _navIcon('assets/icons/Bookmark.png', 2, constraints.maxWidth),
+                  _navIcon('assets/icons/music.png', 3, constraints.maxWidth),
+                  _navIcon('assets/icons/Download.png', 4, constraints.maxWidth),
+                  _navIcon('assets/icons/user.png', 5, constraints.maxWidth),
                 ],
               );
             },

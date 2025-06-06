@@ -282,7 +282,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                 // For You Bento-Style Grid
                 FutureBuilder<List<Anime>>(
-                  future: _aniListService.fetchPopularAnime(perPage: 12),
+                  future: _aniListService.fetchPopularAnime(perPage: 11),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());

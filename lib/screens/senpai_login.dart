@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
+import 'package:senpai_shows/screens/senpai_home.dart';
 import 'package:senpai_shows/screens/senpai_signup.dart';
 import '../components/slide_animation.dart';
 // Hypothetical home screen
@@ -45,13 +46,13 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
             duration: const Duration(seconds: 1),
           ),
         );
-        // Navigator.pushReplacement(
-        //   context,
-        //   SlideAnimation(
-        //     page: const SenpaiHomeScreen(),
-        //     direction: AxisDirection.right,
-        //   ),
-        // );
+        Navigator.pushReplacement(
+          context,
+          SlideAnimation(
+            page: const SenpaiHome(),
+            direction: AxisDirection.right,
+          ),
+        );
       }
     } else {
       if (mounted) {
@@ -78,13 +79,13 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
           duration: const Duration(seconds: 1),
         ),
       );
-      // Navigator.pushReplacement(
-      //   context,
-      //   SlideAnimation(
-      //     page: const SenpaiHomeScreen(),
-      //     direction: AxisDirection.right,
-      //   ),
-      // );
+      Navigator.pushReplacement(
+        context,
+        SlideAnimation(
+          page: const SenpaiHome(),
+          direction: AxisDirection.right,
+        ),
+      );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -112,13 +113,13 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
             duration: const Duration(seconds: 1),
           ),
         );
-        // Navigator.pushReplacement(
-        //   context,
-        //   SlideAnimation(
-        //     page: const SenpaiHomeScreen(),
-        //     direction: AxisDirection.right,
-        //   ),
-        // );
+        Navigator.pushReplacement(
+          context,
+          SlideAnimation(
+            page: const SenpaiHome(),
+            direction: AxisDirection.right,
+          ),
+        );
       }
     } else {
       if (mounted) {
@@ -296,7 +297,8 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _performLogin,
+                                onPressed: (){_isLoading ? null : _performLogin;
+                                  },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF4ECDC4),
                                   shape: RoundedRectangleBorder(

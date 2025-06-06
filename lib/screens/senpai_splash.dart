@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:senpai_shows/screens/senpai_login.dart';
 
+import '../components/slide_animation.dart';
+
 class SenpaiSplash extends StatefulWidget {
   const SenpaiSplash({super.key});
 
@@ -111,7 +113,10 @@ class SenpaiSplashState extends State<SenpaiSplash>
                     // Navigation happens ONLY when button is pressed
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SenpaiLogin()),
+                      SlideAnimation(
+                        page: const SenpaiLogin(),
+                        direction: AxisDirection.up,
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(

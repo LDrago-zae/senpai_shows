@@ -16,7 +16,7 @@ class AniListApiService {
               romaji
             }
             coverImage {
-              large
+              extraLarge
             }
             averageScore
           }
@@ -60,7 +60,7 @@ class AniListApiService {
               romaji
             }
             coverImage {
-              large
+              extraLarge
             }
             averageScore
           }
@@ -104,7 +104,7 @@ class AniListApiService {
               romaji
             }
             coverImage {
-              large
+              extraLarge
             }
             averageScore
           }

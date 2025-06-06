@@ -3,11 +3,7 @@ class Anime {
   final String title;
   final String imageUrl;
 
-  Anime({
-    required this.id,
-    required this.title,
-    required this.imageUrl,
-  });
+  Anime({required this.id, required this.title, required this.imageUrl});
 
   factory Anime.fromShikimoriJson(Map<String, dynamic> json) {
     return Anime(
@@ -21,15 +17,23 @@ class Anime {
     return Anime(
       id: json['id'],
       title: json['title']['romaji'] ?? 'Unknown',
-      imageUrl: json['coverImage']['large'] ?? '',
+      imageUrl: json['coverImage']['extraLarge'] ?? '',
     );
   }
 
-  factory Anime.fromJikanJson(Map<String, dynamic> json) {
+  // factory Anime.fromJikanJson(Map<String, dynamic> json) {
+  //   return Anime(
+  //     title: json['title'] ?? '',
+  //     imageUrl: json['images']['jpg']['image_url'] ?? '',
+  //     id: json['id'],
+  //   );
+
+  factory Anime.fromKitsuJson(Map<String, dynamic> json) {
+    final attributes = json['attributes'];
     return Anime(
-      title: json['title'] ?? '',
-      imageUrl: json['images']['jpg']['image_url'] ?? '',
-      id: json['id'],
+      id: int.tryParse(json['id']) ?? 0,
+      title: attributes['canonicalTitle'] ?? 'Unknown',
+      imageUrl: attributes['posterImage']?['original'] ?? '',
     );
   }
 }

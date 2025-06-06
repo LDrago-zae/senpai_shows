@@ -8,11 +8,10 @@ import 'package:senpai_shows/components/custom_bottom_nav.dart';
 import 'package:senpai_shows/services/anilist_service.dart';
 import 'package:senpai_shows/services/shikimori_service.dart';
 import 'package:senpai_shows/services/jikan_api_service.dart';
-
-
-import '../components/bento_grid.dart';
-import '../components/featured_banner.dart';
-import '../models/anime_model.dart';
+import 'package:senpai_shows/components/bento_grid.dart';
+import 'package:senpai_shows/components/featured_banner.dart';
+import 'package:senpai_shows/models/anime_model.dart';
+import 'package:senpai_shows/services/kitsu_service.dart';
 
 class SenpaiHome extends StatefulWidget {
   const SenpaiHome({super.key});
@@ -25,14 +24,15 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   int _selectedIndex = 0;
   final AniListApiService _aniListService = AniListApiService();
   final ShikimoriApiService _shikimoriService = ShikimoriApiService();
+  final KitsuApiService _kitsuService = KitsuApiService();
   // final JikanApiService _jikanService = JikanApiService();
 
   late Future<List<Anime>> popularAnimeFuture;
   late Future<List<Anime>> recentAnimeFuture;
   late Future<List<Anime>> shikimoriPopularAnimeFuture;
   late Future<List<Anime>> shikimoriRecentAnimeFuture;
-  late Future<List<Anime>> jikanPopularAnimeFuture;
-  late Future<List<Anime>> jikanRecentAnimeFuture;
+  // late Future<List<Anime>> jikanPopularAnimeFuture;
+  // late Future<List<Anime>> jikanRecentAnimeFuture;
 
   List<Anime>? _cachedJikanPopularAnime;
   List<Anime>? _cachedJikanRecentAnime;
@@ -50,7 +50,6 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     shikimoriRecentAnimeFuture = _fetchAndCacheShikimoriRecentAnime();
     // jikanPopularAnimeFuture = _fetchAndCacheJikanPopularAnime();
     // jikanRecentAnimeFuture = _fetchAndCacheJikanRecentAnime();
-
   }
 
   Future<List<Anime>> _fetchAndCachePopularAnime() async {
@@ -70,7 +69,6 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     return fetchedAnime;
   }
 
-  // Correctly fetches and caches POPULAR anime from Shikimori
   Future<List<Anime>> _fetchAndCacheShikimoriPopularAnime() async {
     if (_cachedShikimoriPopularAnime != null) {
       return _cachedShikimoriPopularAnime!;
@@ -80,7 +78,6 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     return fetchedAnime;
   }
 
-  // Correctly fetches and caches RECENT anime from Shikimori
   Future<List<Anime>> _fetchAndCacheShikimoriRecentAnime() async {
     if (_cachedShikimoriRecentAnime != null) {
       return _cachedShikimoriRecentAnime!;
@@ -127,7 +124,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
           SingleChildScrollView(
             child: Column(
               children: [
-                // FeaturedBanner replaces the carousel section
+                // FeaturedBanner using KitsuApiService
                 FeaturedBanner(
                   fetchAnime: _aniListService.fetchRecentAnime(perPage: 10),
                 ),
@@ -165,7 +162,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                 SizedBox(
                   height: 220,
                   child: FutureBuilder<List<Anime>>(
-                    future: popularAnimeFuture,
+                    future: _kitsuService.fetchTopAiringAnime(limit: 10),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -285,7 +282,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                 // For You Bento-Style Grid
                 FutureBuilder<List<Anime>>(
-                  future: recentAnimeFuture,
+                  future: _aniListService.fetchPopularAnime(perPage: 12),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());

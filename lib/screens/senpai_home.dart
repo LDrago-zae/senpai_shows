@@ -7,6 +7,8 @@ import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/components/custom_bottom_nav.dart';
 import 'package:senpai_shows/services/anilist_service.dart';
 import 'package:senpai_shows/services/shikimori_service.dart';
+import 'package:senpai_shows/services/jikan_api_service.dart';
+
 
 import '../components/bento_grid.dart';
 import '../components/featured_banner.dart';
@@ -22,18 +24,33 @@ class SenpaiHome extends StatefulWidget {
 class _SenpaiHomeState extends State<SenpaiHome> {
   int _selectedIndex = 0;
   final AniListApiService _aniListService = AniListApiService();
+  final ShikimoriApiService _shikimoriService = ShikimoriApiService();
+  // final JikanApiService _jikanService = JikanApiService();
 
   late Future<List<Anime>> popularAnimeFuture;
   late Future<List<Anime>> recentAnimeFuture;
+  late Future<List<Anime>> shikimoriPopularAnimeFuture;
+  late Future<List<Anime>> shikimoriRecentAnimeFuture;
+  late Future<List<Anime>> jikanPopularAnimeFuture;
+  late Future<List<Anime>> jikanRecentAnimeFuture;
 
+  List<Anime>? _cachedJikanPopularAnime;
+  List<Anime>? _cachedJikanRecentAnime;
   List<Anime>? _cachedPopularAnime;
   List<Anime>? _cachedRecentAnime;
+  List<Anime>? _cachedShikimoriPopularAnime;
+  List<Anime>? _cachedShikimoriRecentAnime;
 
   @override
   void initState() {
     super.initState();
     recentAnimeFuture = _fetchAndCacheRecentAnime();
     popularAnimeFuture = _fetchAndCachePopularAnime();
+    shikimoriPopularAnimeFuture = _fetchAndCacheShikimoriPopularAnime();
+    shikimoriRecentAnimeFuture = _fetchAndCacheShikimoriRecentAnime();
+    // jikanPopularAnimeFuture = _fetchAndCacheJikanPopularAnime();
+    // jikanRecentAnimeFuture = _fetchAndCacheJikanRecentAnime();
+
   }
 
   Future<List<Anime>> _fetchAndCachePopularAnime() async {
@@ -52,6 +69,40 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     final fetchedAnime = await _aniListService.fetchRecentAnime(perPage: 15);
     return fetchedAnime;
   }
+
+  // Correctly fetches and caches POPULAR anime from Shikimori
+  Future<List<Anime>> _fetchAndCacheShikimoriPopularAnime() async {
+    if (_cachedShikimoriPopularAnime != null) {
+      return _cachedShikimoriPopularAnime!;
+    }
+    final fetchedAnime = await _shikimoriService.fetchPopularAnime(limit: 15);
+    _cachedShikimoriPopularAnime = fetchedAnime;
+    return fetchedAnime;
+  }
+
+  // Correctly fetches and caches RECENT anime from Shikimori
+  Future<List<Anime>> _fetchAndCacheShikimoriRecentAnime() async {
+    if (_cachedShikimoriRecentAnime != null) {
+      return _cachedShikimoriRecentAnime!;
+    }
+    final fetchedAnime = await _shikimoriService.fetchRecentAnime(limit: 15);
+    _cachedShikimoriRecentAnime = fetchedAnime;
+    return fetchedAnime;
+  }
+
+  // Future<List<Anime>> _fetchAndCacheJikanPopularAnime() async {
+  //   if (_cachedJikanPopularAnime != null) return _cachedJikanPopularAnime!;
+  //   final fetchedAnime = await _jikanService.fetchPopularAnime(limit: 15);
+  //   _cachedJikanPopularAnime = fetchedAnime;
+  //   return fetchedAnime;
+  // }
+  //
+  // Future<List<Anime>> _fetchAndCacheJikanRecentAnime() async {
+  //   if (_cachedJikanRecentAnime != null) return _cachedJikanRecentAnime!;
+  //   final fetchedAnime = await _jikanService.fetchRecentAnime(limit: 15);
+  //   _cachedJikanRecentAnime = fetchedAnime;
+  //   return fetchedAnime;
+  // }
 
   void onItemTapped(int index) {
     setState(() {

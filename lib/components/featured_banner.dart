@@ -153,7 +153,7 @@ class FeaturedBanner extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: 50,
+                top: 48,
                 right: 16,
                 child: Row(
                   children: [

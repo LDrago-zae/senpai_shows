@@ -52,84 +52,94 @@ class _CosmicGlassmorphicContainerState extends State<CosmicGlassmorphicContaine
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFF0A001A).withOpacity(1.0 - _gradientAnimation.value * 0.2), // Dark space
-                const Color(0xFF2A004D).withOpacity(1.0 - _gradientAnimation.value * 0.2), // Dark nebula
+    return SizedBox.expand(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF0A001A).withOpacity(1.0 - _gradientAnimation.value * 0.2),
+                  const Color(0xFF2A004D).withOpacity(1.0 - _gradientAnimation.value * 0.2),
+                ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Twinkling stars
+                AnimatedBuilder(
+                  animation: _starAnimation,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      painter: StarPainter(_starAnimation.value),
+                      willChange: true,
+                      child: Container(),
+                    );
+                  },
+                ),
+                // Neon hexagonal pattern
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.15,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              const Color(0xFF00C4CC).withOpacity(0.1),
+                              const Color(0xFF4A007A).withOpacity(0.1),
+                            ],
+                            stops: const [0.4, 0.6],
+                          ),
+                        ),
+                        child: ClipPath(
+                          clipper: HexagonClipper(),
+                          child: Container(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Glassmorphic overlay for content
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: widget.blurStrength,
+                      sigmaY: widget.blurStrength,
+                    ),
+                    child: Container(
+                      padding: widget.padding,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.black.withOpacity(0.3),
+                            Colors.black.withOpacity(0.1),
+                          ],
+                        ),
+                        // border: widget.borderRadius > 0
+                        //     ? Border.all(
+                        //   color: const Color(0xFF00C4CC).withOpacity(0.5),
+                        //   width: 1.0,
+                        // )
+                        //     : null,
+                        borderRadius: BorderRadius.circular(widget.borderRadius),
+                      ),
+                      child: widget.child,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-          child: Stack(
-            children: [
-              // Twinkling stars
-              AnimatedBuilder(
-                animation: _starAnimation,
-                builder: (context, child) {
-                  return CustomPaint(
-                    painter: StarPainter(_starAnimation.value),
-                    child: Container(),
-                  );
-                },
-              ),
-              // Neon hexagonal pattern
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF00C4CC).withOpacity(0.1), // Dark neon teal
-                      const Color(0xFF4A007A).withOpacity(0.1), // Dark neon purple
-                    ],
-                    stops: const [0.4, 0.6],
-                  ),
-                ),
-                child: ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Container(
-                    color: Colors.transparent,
-                  ),
-                ),
-              ),
-              // Glassmorphic overlay
-              BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: widget.blurStrength,
-                  sigmaY: widget.blurStrength,
-                ),
-                child: Container(
-                  padding: widget.padding,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withOpacity(0.3),
-                        Colors.black.withOpacity(0.1),
-                      ],
-                    ),
-                    border: Border.all(
-                      color: const Color(0xFF00C4CC).withOpacity(0.5), // Neon cyan border
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                  ),
-                  child: widget.child,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

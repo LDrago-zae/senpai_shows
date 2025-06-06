@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/components/custom_bottom_nav.dart';
@@ -61,32 +62,49 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black12,
-      body: SafeArea(
-        child: CosmicGlassmorphicContainer(
-          child: SingleChildScrollView(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      body: Stack(
+        children: [
+          const CosmicGlassmorphicContainer(
+            blurStrength: 6.0,
+            borderRadius: 16.0,
+            padding: EdgeInsets.all(16.0),
+            child: SizedBox.expand(),
+          ),
+
+          SingleChildScrollView(
             child: Column(
               children: [
                 // FeaturedBanner replaces the carousel section
-                FeaturedBanner(fetchAnime: recentAnimeFuture),
+                FeaturedBanner(
+                  fetchAnime: _aniListService.fetchRecentAnime(perPage: 10),
+                ),
 
                 // Trending Header
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Trending',
-                        style: TextStyle(
-                          fontSize: 20,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       Text(
                         'See all',
-                        style: TextStyle(color: Colors.tealAccent),
+                        style: GoogleFonts.urbanist(
+                          color: Colors.tealAccent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -199,14 +217,14 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                 ),
 
                 // For You Header
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'For You',
-                      style: TextStyle(
-                        fontSize: 20,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -236,26 +254,10 @@ class _SenpaiHomeState extends State<SenpaiHome> {
               ],
             ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xff9DB2CE).withAlpha(128),
-              const Color(0xff9DB2CE).withAlpha(153),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(64),
-            bottom: Radius.circular(24),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        margin: const EdgeInsets.only(bottom: 8, left: 6, right: 6),
         child: CustomBottomNav(
           selectedIndex: _selectedIndex,
           onItemTapped: onItemTapped,

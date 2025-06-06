@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../models/anime_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -144,24 +145,26 @@ class FeaturedBanner extends StatelessWidget {
                 left: 16,
                 child: IconButton(
                   onPressed: () {},
-                  icon: const Icon(Icons.menu, size: 24),
-                  color: Colors.white,
+                  icon: Image.asset(
+                    'assets/senpaiAssets/logo.png',
+                    width: 100,
+                    height: 100,
+                  ),
                 ),
               ),
               Positioned(
-                top: 16,
+                top: 50,
                 right: 16,
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.search, size: 24),
+                      icon: FaIcon(Icons.search_rounded),
                       color: Colors.white,
                     ),
-                    const SizedBox(width: 12),
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.notifications, size: 24),
+                      icon: const FaIcon(Icons.notifications_none, size: 24),
                       color: Colors.white,
                     ),
                   ],

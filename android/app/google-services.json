@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "475400323318",
+    "project_id": "senpai-shows",
+    "storage_bucket": "senpai-shows.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475400323318:android:759b064448d5ac1d3dacd7",
+        "android_client_info": {
+          "package_name": "com.example.senpai_shows"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdOs-W9aqIyjlTiejl8eChIH54GWLfHQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

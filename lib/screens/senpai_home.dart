@@ -1,17 +1,16 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/components/custom_bottom_nav.dart';
+import 'package:senpai_shows/components/featured_banner.dart';
+import 'package:senpai_shows/components/bento_grid.dart';
+import 'package:senpai_shows/models/anime_model.dart';
+import 'package:senpai_shows/screens/senpai_search.dart';
 import 'package:senpai_shows/services/anilist_service.dart';
 import 'package:senpai_shows/services/shikimori_service.dart';
-import 'package:senpai_shows/services/jikan_api_service.dart';
-import 'package:senpai_shows/components/bento_grid.dart';
-import 'package:senpai_shows/components/featured_banner.dart';
-import 'package:senpai_shows/models/anime_model.dart';
 import 'package:senpai_shows/services/kitsu_service.dart';
+
 
 class SenpaiHome extends StatefulWidget {
   const SenpaiHome({super.key});
@@ -25,17 +24,13 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   final AniListApiService _aniListService = AniListApiService();
   final ShikimoriApiService _shikimoriService = ShikimoriApiService();
   final KitsuApiService _kitsuService = KitsuApiService();
-  // final JikanApiService _jikanService = JikanApiService();
+  final ScrollController _scrollController = ScrollController();
 
   late Future<List<Anime>> popularAnimeFuture;
   late Future<List<Anime>> recentAnimeFuture;
   late Future<List<Anime>> shikimoriPopularAnimeFuture;
   late Future<List<Anime>> shikimoriRecentAnimeFuture;
-  // late Future<List<Anime>> jikanPopularAnimeFuture;
-  // late Future<List<Anime>> jikanRecentAnimeFuture;
 
-  List<Anime>? _cachedJikanPopularAnime;
-  List<Anime>? _cachedJikanRecentAnime;
   List<Anime>? _cachedPopularAnime;
   List<Anime>? _cachedRecentAnime;
   List<Anime>? _cachedShikimoriPopularAnime;
@@ -48,8 +43,23 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     popularAnimeFuture = _fetchAndCachePopularAnime();
     shikimoriPopularAnimeFuture = _fetchAndCacheShikimoriPopularAnime();
     shikimoriRecentAnimeFuture = _fetchAndCacheShikimoriRecentAnime();
-    // jikanPopularAnimeFuture = _fetchAndCacheJikanPopularAnime();
-    // jikanRecentAnimeFuture = _fetchAndCacheJikanRecentAnime();
+
+    // Scroll to the bottom after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<List<Anime>> _fetchAndCachePopularAnime() async {
@@ -66,6 +76,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
       return _cachedRecentAnime!;
     }
     final fetchedAnime = await _aniListService.fetchRecentAnime(perPage: 15);
+    _cachedRecentAnime = fetchedAnime;
     return fetchedAnime;
   }
 
@@ -87,24 +98,17 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     return fetchedAnime;
   }
 
-  // Future<List<Anime>> _fetchAndCacheJikanPopularAnime() async {
-  //   if (_cachedJikanPopularAnime != null) return _cachedJikanPopularAnime!;
-  //   final fetchedAnime = await _jikanService.fetchPopularAnime(limit: 15);
-  //   _cachedJikanPopularAnime = fetchedAnime;
-  //   return fetchedAnime;
-  // }
-  //
-  // Future<List<Anime>> _fetchAndCacheJikanRecentAnime() async {
-  //   if (_cachedJikanRecentAnime != null) return _cachedJikanRecentAnime!;
-  //   final fetchedAnime = await _jikanService.fetchRecentAnime(limit: 15);
-  //   _cachedJikanRecentAnime = fetchedAnime;
-  //   return fetchedAnime;
-  // }
-
   void onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SenpaiSearch()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -114,14 +118,15 @@ class _SenpaiHomeState extends State<SenpaiHome> {
       extendBody: true,
       body: Stack(
         children: [
-          const CosmicGlassmorphicContainer(
+          const LightBlackGlassmorphicContainer(
             blurStrength: 6.0,
             borderRadius: 16.0,
             padding: EdgeInsets.all(16.0),
             child: SizedBox.expand(),
           ),
-
           SingleChildScrollView(
+            controller: _scrollController,
+            padding: const EdgeInsets.only(bottom: 80.0), // Account for nav bar height
             child: Column(
               children: [
                 // FeaturedBanner using KitsuApiService
@@ -131,10 +136,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                 // Trending Header
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 12,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -174,10 +176,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: animeList.length,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         itemBuilder: (context, index) {
                           final anime = animeList[index];
                           return Container(
@@ -236,10 +235,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                                     top: 8,
                                     left: 8,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 4,
-                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: Colors.tealAccent,
                                         borderRadius: BorderRadius.circular(8),
@@ -282,7 +278,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                 // For You Bento-Style Grid
                 FutureBuilder<List<Anime>>(
-                  future: _aniListService.fetchPopularAnime(perPage: 11),
+                  future: _kitsuService.fetchAnimeList(limit: 12),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -304,8 +300,15 @@ class _SenpaiHomeState extends State<SenpaiHome> {
           ),
         ],
       ),
+
+
+
+
+
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(bottom: 8, left: 6, right: 6),
+
+
         child: CustomBottomNav(
           selectedIndex: _selectedIndex,
           onItemTapped: onItemTapped,

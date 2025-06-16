@@ -149,7 +149,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
           ),
         ),
         child: SafeArea(
-          child: CosmicGlassmorphicContainer(
+          child: LightBlackGlassmorphicContainer(
             child: Column(
               children: [
                 Padding(

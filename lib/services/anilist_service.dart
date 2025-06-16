@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/anime_model.dart';
-import 'package:senpai_shows/models/anime_model.dart';
 
 class AniListApiService {
   static const String _apiUrl = 'https://graphql.anilist.co';

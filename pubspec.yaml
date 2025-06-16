@@ -31,26 +31,26 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  firebase_core: ^3.13.1
-  firebase_auth: ^5.5.4
-  cloud_firestore: ^5.6.0
-  flutter_svg: ^2.0.9
+  firebase_core: ^3.14.0
+  firebase_auth: ^5.6.0
+  cloud_firestore: ^5.6.9
+  flutter_svg: ^2.1.0
   google_sign_in: ^6.3.0
-  flutter_appauth: ^5.0.0  # PKCE OAuth flow       # Handle deep links
+  flutter_appauth: ^9.0.1  # PKCE OAuth flow       # Handle deep links
   http: ^1.4.0
-  flutter_dotenv: ^5.1.0
-  uuid: ^3.0.7
-  oauth2: ^2.0.0
-  url_launcher: ^6.0.0
+  flutter_dotenv: ^5.2.1
+  uuid: ^4.5.1
+  oauth2: ^2.0.3
+  url_launcher: ^6.3.1
   app_links: ^6.4.0
   font_awesome_flutter: ^10.8.0
   shikimori_api: ^0.0.6
-  carousel_slider: ^5.0.0
+  carousel_slider: ^5.1.1
   google_fonts: ^6.2.1
   sqflite: ^2.4.2
   path: ^1.9.1
   shimmer: ^3.0.0
-  cached_network_image: ^3.3.1
+  cached_network_image: ^3.4.1
   jikan_api: ^2.2.1
 
 

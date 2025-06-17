@@ -11,62 +11,79 @@ class SenpaiSearch extends StatefulWidget {
 class _SearchScreenState extends State<SenpaiSearch> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  bool _showSearchResults = false;
 
-  // Sample genre data - replace with your actual data
+  List<bool> _visibleCards = [];
+
   final List<Map<String, dynamic>> _genres = [
     {
       'name': 'Action',
-      'imageAsset': 'assets/senpaiAssets/actionanime.jpeg',
-      // Replace with your image
-      'color': Colors.redAccent,
+      'imageAsset': 'assets/senpaiAssets/solo.jpg',
+      'color': Colors.transparent,
     },
     {
       'name': 'Adventure',
       'imageAsset': 'https://example.com/adventure.jpg',
-      'color': Colors.blueAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Comedy',
       'imageAsset': 'https://example.com/comedy.jpg',
-      'color': Colors.yellowAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Drama',
       'imageAsset': 'https://example.com/drama.jpg',
-      'color': Colors.purpleAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Fantasy',
       'imageAsset': 'https://example.com/fantasy.jpg',
-      'color': Colors.greenAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Horror',
       'imageAsset': 'https://example.com/horror.jpg',
-      'color': Colors.deepOrangeAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Mystery',
       'imageAsset': 'https://example.com/mystery.jpg',
-      'color': Colors.indigoAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Romance',
       'imageAsset': 'https://example.com/romance.jpg',
-      'color': Colors.pinkAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Sci-Fi',
       'imageAsset': 'https://example.com/scifi.jpg',
-      'color': Colors.tealAccent,
+      'color': Colors.transparent,
     },
     {
       'name': 'Slice of Life',
       'imageAsset': 'https://example.com/sliceoflife.jpg',
-      'color': Colors.lightBlueAccent,
+      'color': Colors.transparent,
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _visibleCards = List.generate(_genres.length, (_) => false);
+    _startAnimationSequence();
+  }
+
+  void _startAnimationSequence() async {
+    for (int i = 0; i < _genres.length; i++) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (mounted) {
+        setState(() {
+          _visibleCards[i] = true;
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -82,7 +99,6 @@ class _SearchScreenState extends State<SenpaiSearch> {
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
@@ -100,14 +116,6 @@ class _SearchScreenState extends State<SenpaiSearch> {
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
-                  onTap: () {
-                    setState(() {
-                      _showSearchResults = true;
-                    });
-                  },
-                  onSubmitted: (value) {
-                    // Handle search submission
-                  },
                   style: GoogleFonts.urbanist(
                     color: Colors.white,
                     fontSize: 16,
@@ -130,24 +138,29 @@ class _SearchScreenState extends State<SenpaiSearch> {
                 ),
               ),
             ),
-
-            // Genre List with fade effect
             Expanded(
-              child: AnimatedOpacity(
-                opacity: _showSearchResults ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _genres.length,
-                  itemBuilder: (context, index) {
-                    final genre = _genres[index];
-                    return _buildGenreCard(
-                      genre['name'],
-                      genre['imageAsset'],
-                      genre['color'],
-                    );
-                  },
-                ),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _genres.length,
+                itemBuilder: (context, index) {
+                  final genre = _genres[index];
+                  return AnimatedOpacity(
+                    opacity: _visibleCards[index] ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOut,
+                    child: AnimatedSlide(
+                      offset:
+                      _visibleCards[index] ? Offset.zero : const Offset(0, 0.2),
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOut,
+                      child: _buildGenreCard(
+                        genre['name'],
+                        genre['imageAsset'],
+                        genre['color'],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -157,6 +170,8 @@ class _SearchScreenState extends State<SenpaiSearch> {
   }
 
   Widget _buildGenreCard(String genreName, String imageAssetPath, Color color) {
+    final isNetworkImage = imageAssetPath.startsWith('http');
+
     return Container(
       height: 200,
       margin: const EdgeInsets.only(bottom: 16, right: 8, left: 8),
@@ -175,20 +190,27 @@ class _SearchScreenState extends State<SenpaiSearch> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Background image using local asset
-            Image.asset(
-              imageAssetPath, // Use the asset path directly
+            isNetworkImage
+                ? Image.network(
+              imageAssetPath,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Container(
-                    color: Colors.grey[800],
-                    child: const Center(
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  ),
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[800],
+                child: const Center(
+                  child: Icon(Icons.broken_image, color: Colors.grey),
+                ),
+              ),
+            )
+                : Image.asset(
+              imageAssetPath,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[800],
+                child: const Center(
+                  child: Icon(Icons.broken_image, color: Colors.grey),
+                ),
+              ),
             ),
-
-            // Gradient overlay
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -201,8 +223,6 @@ class _SearchScreenState extends State<SenpaiSearch> {
                 ),
               ),
             ),
-
-            // Genre name
             Positioned(
               bottom: 16,
               left: 16,
@@ -223,13 +243,10 @@ class _SearchScreenState extends State<SenpaiSearch> {
                 ),
               ),
             ),
-
-            // Tap effect
             Material(
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // Handle genre selection
                   print('Selected genre: $genreName');
                 },
                 splashColor: color.withOpacity(0.3),

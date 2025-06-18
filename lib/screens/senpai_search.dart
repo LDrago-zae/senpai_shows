@@ -107,7 +107,7 @@ class _SearchScreenState extends State<SenpaiSearch> {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -122,13 +122,8 @@ class _SearchScreenState extends State<SenpaiSearch> {
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search anime...',
-                    hintStyle: GoogleFonts.urbanist(
-                      color: Colors.grey[400],
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey[400],
-                    ),
+                    hintStyle: GoogleFonts.urbanist(color: Colors.grey[400]),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 16,
@@ -150,7 +145,9 @@ class _SearchScreenState extends State<SenpaiSearch> {
                     curve: Curves.easeOut,
                     child: AnimatedSlide(
                       offset:
-                      _visibleCards[index] ? Offset.zero : const Offset(0, 0.2),
+                          _visibleCards[index]
+                              ? Offset.zero
+                              : const Offset(0, 0.2),
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeOut,
                       child: _buildGenreCard(
@@ -179,7 +176,7 @@ class _SearchScreenState extends State<SenpaiSearch> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: .4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -192,34 +189,33 @@ class _SearchScreenState extends State<SenpaiSearch> {
           children: [
             isNetworkImage
                 ? Image.network(
-              imageAssetPath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: const Center(
-                  child: Icon(Icons.broken_image, color: Colors.grey),
-                ),
-              ),
-            )
+                  imageAssetPath,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        color: Colors.grey[800],
+                        child: const Center(
+                          child: Icon(Icons.broken_image, color: Colors.grey),
+                        ),
+                      ),
+                )
                 : Image.asset(
-              imageAssetPath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: const Center(
-                  child: Icon(Icons.broken_image, color: Colors.grey),
+                  imageAssetPath,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        color: Colors.grey[800],
+                        child: const Center(
+                          child: Icon(Icons.broken_image, color: Colors.grey),
+                        ),
+                      ),
                 ),
-              ),
-            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    color.withOpacity(0.7),
-                  ],
+                  colors: [Colors.transparent, color.withValues(alpha: 0.7)],
                 ),
               ),
             ),
@@ -236,7 +232,7 @@ class _SearchScreenState extends State<SenpaiSearch> {
                   shadows: [
                     Shadow(
                       blurRadius: 8,
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.black.withValues(alpha: 0.8),
                       offset: const Offset(2, 2),
                     ),
                   ],
@@ -249,7 +245,7 @@ class _SearchScreenState extends State<SenpaiSearch> {
                 onTap: () {
                   print('Selected genre: $genreName');
                 },
-                splashColor: color.withOpacity(0.3),
+                splashColor: color.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),

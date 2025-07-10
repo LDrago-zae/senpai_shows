@@ -14,41 +14,42 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
+  final ValueNotifier<int> _tabNotifier = ValueNotifier(0);
+  late final SenpaiSearch _senpaiSearchScreen;
+
+  @override
+  void initState() {
+    super.initState();
+    _senpaiSearchScreen = SenpaiSearch(tabNotifier: _tabNotifier);
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _tabNotifier.value = index; // 👈 notify which screen is selected
     });
   }
-
-  final List<Widget> _screens = const [
-    SenpaiHome(),
-    SenpaiSearch(),
-    // Future Screens:
-    // BookmarksScreen(),
-    // MusicScreen(),
-    // DownloadsScreen(),
-    // ProfileScreen(),
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Allows content behind the bottom nav
+      extendBody: true,
       backgroundColor: Colors.black,
       body: IndexedStack(
         index: _selectedIndex,
-        children: _screens,
+        children: [
+          const SenpaiHome(),
+          _senpaiSearchScreen,
+        ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
+        padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(32),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32),
-              // color: Colors.black, // Keep background same as screen
-              // 🔥 No shadow, clean floating nav
-            ),
+          child: Material(
+            elevation: 10,
+            borderRadius: BorderRadius.circular(32),
+            color: Colors.transparent,
             child: CustomBottomNav(
               selectedIndex: _selectedIndex,
               onItemTapped: _onItemTapped,
@@ -59,3 +60,4 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 }
+

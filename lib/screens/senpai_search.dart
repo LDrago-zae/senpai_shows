@@ -2,17 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SenpaiSearch extends StatefulWidget {
-  const SenpaiSearch({super.key});
+  final ValueNotifier<int> tabNotifier;
+
+  const SenpaiSearch({super.key, required this.tabNotifier});
 
   @override
   State<SenpaiSearch> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SenpaiSearch> {
+class _SearchScreenState extends State<SenpaiSearch>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-
-  List<bool> _visibleCards = [];
+  late AnimationController _animationController;
+  late List<Animation<double>> _opacityAnimations;
+  late List<Animation<double>> _slideAnimations;
+  late VoidCallback _tabListener;
 
   final List<Map<String, dynamic>> _genres = [
     {'name': 'Action', 'imageAsset': 'assets/senpaiAssets/solo2.png', 'color': Colors.transparent},
@@ -30,94 +35,129 @@ class _SearchScreenState extends State<SenpaiSearch> {
   @override
   void initState() {
     super.initState();
-    _visibleCards = List.generate(_genres.length, (_) => false);
-    _startAnimationSequence();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _opacityAnimations = List.generate(
+      _genres.length,
+          (index) => Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _animationController,
+          curve: Interval(index * 0.08, (index * 0.08) + 0.28, curve: Curves.easeOut),
+        ),
+      ),
+    );
+
+    _slideAnimations = List.generate(
+      _genres.length,
+          (index) => Tween<double>(begin: 50.0, end: 0.0).animate(
+        CurvedAnimation(
+          parent: _animationController,
+          curve: Interval(index * 0.08, (index * 0.08) + 0.28, curve: Curves.easeOut),
+        ),
+      ),
+    );
+
+    _tabListener = () {
+      if (widget.tabNotifier.value == 1) {
+        _triggerAnimation();
+      }
+    };
+
+    widget.tabNotifier.addListener(_tabListener);
+
+    // Start animation initially if this screen is first
+    if (widget.tabNotifier.value == 1) {
+      _triggerAnimation();
+    }
   }
 
-  void _startAnimationSequence() async {
-    for (int i = 0; i < _genres.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (mounted) {
-        setState(() {
-          _visibleCards[i] = true;
-        });
-      }
-    }
+  void _triggerAnimation() {
+    _animationController.reset();
+    _animationController.forward();
   }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
+    widget.tabNotifier.removeListener(_tabListener);
     super.dispose();
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       color: Colors.grey[900],
-      child: Column(
-        children: [
-          // No SafeArea here — let MainNavigation handle insets
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 40, 16, 16), // top padding manually
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[800],
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                style: GoogleFonts.urbanist(
-                  color: Colors.white,
-                  fontSize: 16,
+      child: SafeArea(
+        top: true,
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                decoration: InputDecoration(
-                  hintText: 'Search anime...',
-                  hintStyle: GoogleFonts.urbanist(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  style: GoogleFonts.urbanist(color: Colors.white, fontSize: 16),
+                  decoration: InputDecoration(
+                    hintText: 'Search anime...',
+                    hintStyle: GoogleFonts.urbanist(color: Colors.grey[400]),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                   ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), // 👈🏽 bottom padding so nav doesn't overlap
-              itemCount: _genres.length,
-              itemBuilder: (context, index) {
-                final genre = _genres[index];
-                return AnimatedOpacity(
-                  opacity: _visibleCards[index] ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOut,
-                  child: AnimatedSlide(
-                    offset: _visibleCards[index] ? Offset.zero : const Offset(0, 0.2),
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOut,
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 70),
+                itemCount: _genres.length,
+                itemBuilder: (context, index) {
+                  final genre = _genres[index];
+                  return AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return Opacity(
+                        opacity: _opacityAnimations[index].value,
+                        child: Transform.translate(
+                          offset: Offset(0, _slideAnimations[index].value),
+                          child: child,
+                        ),
+                      );
+                    },
                     child: _buildGenreCard(
                       genre['name'],
                       genre['imageAsset'],
                       genre['color'],
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -147,22 +187,12 @@ class _SearchScreenState extends State<SenpaiSearch> {
                 ? Image.network(
               imageAssetPath,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: const Center(
-                  child: Icon(Icons.broken_image, color: Colors.grey),
-                ),
-              ),
+              errorBuilder: (context, error, stackTrace) => _imageErrorPlaceholder(),
             )
                 : Image.asset(
               imageAssetPath,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: const Center(
-                  child: Icon(Icons.broken_image, color: Colors.grey),
-                ),
-              ),
+              errorBuilder: (context, error, stackTrace) => _imageErrorPlaceholder(),
             ),
             Container(
               decoration: BoxDecoration(
@@ -205,6 +235,15 @@ class _SearchScreenState extends State<SenpaiSearch> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _imageErrorPlaceholder() {
+    return Container(
+      color: Colors.grey[800],
+      child: const Center(
+        child: Icon(Icons.broken_image, color: Colors.grey, size: 50),
       ),
     );
   }

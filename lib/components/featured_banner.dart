@@ -13,7 +13,7 @@ class FeaturedBanner extends StatelessWidget {
     final pageController = PageController();
 
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 30.0),
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 45.0),
       child: SizedBox(
         height: 400,
         child: FutureBuilder<List<Anime>>(

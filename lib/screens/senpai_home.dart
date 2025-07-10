@@ -98,18 +98,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     return fetchedAnime;
   }
 
-  void onItemTapped(int index) {
-    if (index == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SenpaiSearch()),
-      );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -301,19 +290,6 @@ class _SenpaiHomeState extends State<SenpaiHome> {
         ],
       ),
 
-
-
-
-
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(bottom: 8, left: 6, right: 6),
-
-
-        child: CustomBottomNav(
-          selectedIndex: _selectedIndex,
-          onItemTapped: onItemTapped,
-        ),
-      ),
     );
   }
 }

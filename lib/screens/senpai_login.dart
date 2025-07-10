@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
+import 'package:senpai_shows/layout/main_navigation.dart';
 import 'package:senpai_shows/screens/senpai_home.dart';
 import 'package:senpai_shows/screens/senpai_signup.dart';
 import '../components/slide_animation.dart';
@@ -49,7 +50,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
         Navigator.pushReplacement(
           context,
           SlideAnimation(
-            page: const SenpaiHome(),
+            page: const MainNavigation(),
             direction: AxisDirection.right,
           ),
         );
@@ -82,7 +83,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
       Navigator.pushReplacement(
         context,
         SlideAnimation(
-          page: const SenpaiHome(),
+          page: const MainNavigation(),
           direction: AxisDirection.right,
         ),
       );
@@ -116,7 +117,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
         Navigator.pushReplacement(
           context,
           SlideAnimation(
-            page: const SenpaiHome(),
+            page: const MainNavigation(),
             direction: AxisDirection.right,
           ),
         );

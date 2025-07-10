@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
+import 'package:senpai_shows/layout/main_navigation.dart';
 import 'senpai_login.dart'; // Hypothetical home screen
 import '../components/slide_animation.dart';
 
@@ -130,13 +131,13 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
             duration: const Duration(seconds: 1),
           ),
         );
-        // Navigator.pushReplacement(
-        //   context,
-        //   SlideAnimation(
-        //     page: const SenpaiHomeScreen(),
-        //     direction: AxisDirection.right,
-        //   ),
-        // );
+        Navigator.pushReplacement(
+          context,
+          SlideAnimation(
+            page: const MainNavigation(),
+            direction: AxisDirection.right,
+          ),
+        );
       }
     } else {
       if (mounted) {

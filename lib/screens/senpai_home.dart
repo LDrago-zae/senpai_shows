@@ -2,16 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
-import 'package:senpai_shows/components/custom_bottom_nav.dart';
 import 'package:senpai_shows/components/featured_banner.dart';
 import 'package:senpai_shows/components/bento_grid.dart';
+import 'package:senpai_shows/controllers/home_controller.dart';
 import 'package:senpai_shows/models/anime_model.dart';
-import 'package:senpai_shows/screens/senpai_search.dart';
-import 'package:senpai_shows/services/anilist_service.dart';
-import 'package:senpai_shows/services/shikimori_service.dart';
-import 'package:senpai_shows/services/kitsu_service.dart';
 
-import '../controllers/randome_anime_controller.dart';
 
 class SenpaiHome extends StatefulWidget {
   const SenpaiHome({super.key});
@@ -21,22 +16,14 @@ class SenpaiHome extends StatefulWidget {
 }
 
 class _SenpaiHomeState extends State<SenpaiHome> {
-  int _selectedIndex = 0;
-  final AniListApiService _aniListService = AniListApiService();
-  final ShikimoriApiService _shikimoriService = ShikimoriApiService();
-  final KitsuApiService _kitsuService = KitsuApiService();
+  final HomeController _homeController = HomeController();
   final ScrollController _scrollController = ScrollController();
-  final RandomAnimeController _randomAnimeController = RandomAnimeController();
 
   late Future<List<Anime>> popularAnimeFuture;
   late Future<List<Anime>> recentAnimeFuture;
   late Future<List<Anime>> shikimoriPopularAnimeFuture;
   late Future<List<Anime>> shikimoriRecentAnimeFuture;
-
-  List<Anime>? _cachedPopularAnime;
-  List<Anime>? _cachedRecentAnime;
-  List<Anime>? _cachedShikimoriPopularAnime;
-  List<Anime>? _cachedShikimoriRecentAnime;
+  late Future<List<Anime>> featuredAnimeFuture;
 
   // Random anime state
   Anime? _randomAnime;
@@ -46,10 +33,11 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   void initState() {
     super.initState();
-    recentAnimeFuture = _fetchAndCacheRecentAnime();
-    popularAnimeFuture = _fetchAndCachePopularAnime();
-    shikimoriPopularAnimeFuture = _fetchAndCacheShikimoriPopularAnime();
-    shikimoriRecentAnimeFuture = _fetchAndCacheShikimoriRecentAnime();
+    popularAnimeFuture = _homeController.fetchPopularAnime();
+    recentAnimeFuture = _homeController.fetchRecentAnime();
+    shikimoriPopularAnimeFuture = _homeController.fetchShikimoriPopularAnime();
+    shikimoriRecentAnimeFuture = _homeController.fetchShikimoriRecentAnime();
+    featuredAnimeFuture = _homeController.fetchFeaturedAnime();
 
     // Scroll to the bottom after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -66,43 +54,8 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _homeController.dispose();
     super.dispose();
-  }
-
-  Future<List<Anime>> _fetchAndCachePopularAnime() async {
-    if (_cachedPopularAnime != null) {
-      return _cachedPopularAnime!;
-    }
-    final fetchedAnime = await _aniListService.fetchPopularAnime(perPage: 15);
-    _cachedPopularAnime = fetchedAnime;
-    return fetchedAnime;
-  }
-
-  Future<List<Anime>> _fetchAndCacheRecentAnime() async {
-    if (_cachedRecentAnime != null) {
-      return _cachedRecentAnime!;
-    }
-    final fetchedAnime = await _aniListService.fetchRecentAnime(perPage: 15);
-    _cachedRecentAnime = fetchedAnime;
-    return fetchedAnime;
-  }
-
-  Future<List<Anime>> _fetchAndCacheShikimoriPopularAnime() async {
-    if (_cachedShikimoriPopularAnime != null) {
-      return _cachedShikimoriPopularAnime!;
-    }
-    final fetchedAnime = await _shikimoriService.fetchPopularAnime(limit: 15);
-    _cachedShikimoriPopularAnime = fetchedAnime;
-    return fetchedAnime;
-  }
-
-  Future<List<Anime>> _fetchAndCacheShikimoriRecentAnime() async {
-    if (_cachedShikimoriRecentAnime != null) {
-      return _cachedShikimoriRecentAnime!;
-    }
-    final fetchedAnime = await _shikimoriService.fetchRecentAnime(limit: 15);
-    _cachedShikimoriRecentAnime = fetchedAnime;
-    return fetchedAnime;
   }
 
   Future<void> _fetchRandomAnime() async {
@@ -112,7 +65,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     });
 
     try {
-      final anime = await _randomAnimeController.fetchRandomAnime();
+      final anime = await _homeController.fetchRandomAnime();
       setState(() {
         _randomAnime = anime;
         _loadingRandomAnime = false;
@@ -144,9 +97,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
             child: Column(
               children: [
                 FeaturedBanner(
-                  fetchAnime: _kitsuService.fetchTopAiringAnime(
-                    limit: 5,
-                  ),
+                  fetchAnime: _homeController.fetchForYouAnime(),
                 ),
                 const SizedBox(height: 16),
 
@@ -157,8 +108,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                     onPressed: _loadingRandomAnime ? null : _fetchRandomAnime,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.tealAccent.withOpacity(0.2),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -233,7 +183,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                 SizedBox(
                   height: 220,
                   child: FutureBuilder<List<Anime>>(
-                    future: _kitsuService.fetchTopAiringAnime(limit: 10),
+                    future: _homeController.fetchTrendingAnime(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -278,7 +228,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                                     child: Container(
                                       padding: const EdgeInsets.all(8.0),
                                       decoration: BoxDecoration(
-                                        gradient:LinearGradient(
+                                        gradient: LinearGradient(
                                           begin: Alignment.topCenter,
                                           end: Alignment.bottomCenter,
                                           colors: [
@@ -347,7 +297,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                 // For You Bento-Style Grid
                 FutureBuilder<List<Anime>>(
-                  future: _kitsuService.fetchAnimeList(limit: 12),
+                  future: _homeController.fetchForYouAnime(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());

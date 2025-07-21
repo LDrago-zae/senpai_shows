@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:senpai_shows/screens/senpai_bookmarks.dart';
+import 'package:senpai_shows/screens/senpai_downloads.dart';
 import 'package:senpai_shows/screens/senpai_home.dart';
 import 'package:senpai_shows/screens/senpai_search.dart';
+import 'package:senpai_shows/screens/senpai_songs.dart';
 // import other screens as needed
 import '../components/custom_bottom_nav.dart';
+import '../screens/senpai_profile.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -40,6 +44,10 @@ class _MainNavigationState extends State<MainNavigation> {
         children: [
           const SenpaiHome(),
           _senpaiSearchScreen,
+          SenpaiBookmarks(),
+          SenpaiSongs(),
+          SenpaiDownloads(),
+          SenpaiProfile(),
         ],
       ),
       bottomNavigationBar: Padding(

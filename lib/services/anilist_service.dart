@@ -136,4 +136,50 @@ class AniListApiService {
       throw Exception('Failed to load recommended anime from AniList');
     }
   }
+  Future<Anime?> fetchRandomAnime() async {
+    // Pick a random ID (common range: 1 to ~18000 for anime)
+    final int randomId = 10000 + (DateTime.now().millisecondsSinceEpoch % 8000);
+
+    const String query = r'''
+    query ($id: Int) {
+      Media(id: $id, type: ANIME) {
+        id
+        title {
+          romaji
+        }
+        coverImage {
+          extraLarge
+        }
+        averageScore
+        episodes
+        description
+      }
+    }
+  ''';
+
+    final response = await http.post(
+      Uri.parse(_apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        'query': query,
+        'variables': {'id': randomId},
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      final media = jsonResponse['data']['Media'];
+      if (media != null) {
+        return Anime.fromAniListJson(media);
+      }
+      return fetchRandomAnime(); // Retry if no anime found with that ID
+    } else {
+      throw Exception('Failed to fetch random anime');
+    }
+  }
 }
+
+

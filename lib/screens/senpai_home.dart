@@ -6,7 +6,8 @@ import 'package:senpai_shows/components/featured_banner.dart';
 import 'package:senpai_shows/components/bento_grid.dart';
 import 'package:senpai_shows/controllers/home_controller.dart';
 import 'package:senpai_shows/models/anime_model.dart';
-
+import 'package:senpai_shows/database/image_cache_helper.dart';
+import 'dart:typed_data';
 
 class SenpaiHome extends StatefulWidget {
   const SenpaiHome({super.key});
@@ -96,24 +97,30 @@ class _SenpaiHomeState extends State<SenpaiHome> {
             padding: const EdgeInsets.only(bottom: 80.0),
             child: Column(
               children: [
-                FeaturedBanner(
-                  fetchAnime: _homeController.fetchForYouAnime(),
-                ),
+                FeaturedBanner(fetchAnime: _homeController.fetchForYouAnime()),
                 const SizedBox(height: 16),
 
                 // Random Anime Button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 12,
+                  ),
                   child: ElevatedButton(
                     onPressed: _loadingRandomAnime ? null : _fetchRandomAnime,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.tealAccent.withOpacity(0.2),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 0,
-                      side: BorderSide(color: Colors.tealAccent.withOpacity(0.5)),
+                      side: BorderSide(
+                        color: Colors.tealAccent.withOpacity(0.5),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -151,11 +158,14 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                     ),
                   )
                 else if (_randomAnime != null)
-                    RandomAnimeCard(anime: _randomAnime!),
+                  RandomAnimeCard(anime: _randomAnime!),
 
                 // Trending Header
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -195,7 +205,10 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: animeList.length,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         itemBuilder: (context, index) {
                           final anime = animeList[index];
                           return Container(
@@ -215,11 +228,12 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                               borderRadius: BorderRadius.circular(16),
                               child: Stack(
                                 children: [
-                                  Image.network(
-                                    anime.imageUrl,
-                                    fit: BoxFit.cover,
+                                  CachedOrNetworkImage(
+                                    id: anime.id.toString(),
+                                    imageUrl: anime.imageUrl,
                                     width: double.infinity,
                                     height: double.infinity,
+                                    fit: BoxFit.cover,
                                   ),
                                   Positioned(
                                     bottom: 0,
@@ -254,7 +268,10 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                                     top: 8,
                                     left: 8,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: Colors.tealAccent,
                                         borderRadius: BorderRadius.circular(8),
@@ -281,7 +298,10 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                 // For You Header
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 16,
+                  ),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -323,6 +343,71 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   }
 }
 
+// Helper widget to use cached or network image
+Widget CachedOrNetworkImage({
+  required String id,
+  required String imageUrl,
+  double? width,
+  double? height,
+  BoxFit? fit,
+  Color? color,
+  BlendMode? colorBlendMode,
+}) {
+  return FutureBuilder<Uint8List?>(
+    future: ImageCacheHelper().getCachedImage(id),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Container(
+          width: width,
+          height: height,
+          color: Colors.black12,
+          child: const Center(child: CircularProgressIndicator()),
+        );
+      } else if (snapshot.hasData && snapshot.data != null) {
+        // Cached image found
+        return Image.memory(
+          snapshot.data!,
+          width: width,
+          height: height,
+          fit: fit,
+          color: color,
+          colorBlendMode: colorBlendMode,
+        );
+      } else {
+        // Not cached, load from network and cache it
+        return Image.network(
+          imageUrl,
+          width: width,
+          height: height,
+          fit: fit,
+          color: color,
+          colorBlendMode: colorBlendMode,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              // Cache the image after it's loaded
+              ImageCacheHelper().cacheImage(id, imageUrl);
+              return child;
+            }
+            return Container(
+              width: width,
+              height: height,
+              color: Colors.black12,
+              child: const Center(child: CircularProgressIndicator()),
+            );
+          },
+          errorBuilder:
+              (context, error, stackTrace) => Container(
+                width: width,
+                height: height,
+                color: Colors.grey,
+                child: const Icon(Icons.broken_image),
+              ),
+        );
+      }
+    },
+  );
+}
+
 // Random Anime Card Widget
 class RandomAnimeCard extends StatelessWidget {
   final Anime anime;
@@ -349,11 +434,12 @@ class RandomAnimeCard extends StatelessWidget {
         child: Stack(
           children: [
             // Background Image with Blur
-            Image.network(
-              anime.imageUrl,
-              fit: BoxFit.cover,
+            CachedOrNetworkImage(
+              id: anime.id.toString(),
+              imageUrl: anime.imageUrl,
               width: double.infinity,
               height: 250,
+              fit: BoxFit.cover,
               color: Colors.black.withOpacity(0.5),
               colorBlendMode: BlendMode.darken,
             ),
@@ -391,7 +477,10 @@ class RandomAnimeCard extends StatelessWidget {
                     children: [
                       if (anime.genre != null)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.tealAccent.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(8),

@@ -57,7 +57,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       body: Stack(
         children: [
           const LightBlackGlassmorphicContainer(
-            blurStrength: 6.0,
+            blurStrength: 8.0,
             borderRadius: 16.0,
             padding: EdgeInsets.all(16.0),
             child: SizedBox.expand(),

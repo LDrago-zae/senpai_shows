@@ -98,7 +98,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
       body: Stack(
         children: [
           const LightBlackGlassmorphicContainer(
-            blurStrength: 6.0,
+            blurStrength: 8.0,
             borderRadius: 16.0,
             padding: EdgeInsets.all(16.0),
             child: SizedBox.expand(),

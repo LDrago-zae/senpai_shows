@@ -20,16 +20,56 @@ class _SearchScreenState extends State<SenpaiSearch>
   late VoidCallback _tabListener;
 
   final List<Map<String, dynamic>> _genres = [
-    {'name': 'Action', 'imageAsset': 'assets/senpaiAssets/solo2.png', 'color': Colors.transparent},
-    {'name': 'Adventure', 'imageAsset': 'assets/senpaiAssets/op.png', 'color': Colors.transparent},
-    {'name': 'Comedy', 'imageAsset': 'assets/senpaiAssets/dd.png', 'color': Colors.transparent},
-    {'name': 'Drama', 'imageAsset': 'assets/senpaiAssets/cg.jpg', 'color': Colors.transparent},
-    {'name': 'Fantasy', 'imageAsset': 'assets/senpaiAssets/rz.png', 'color': Colors.transparent},
-    {'name': 'Horror', 'imageAsset': 'assets/senpaiAssets/tg.jpg', 'color': Colors.transparent},
-    {'name': 'Mystery', 'imageAsset': 'assets/senpaiAssets/er.jpg', 'color': Colors.transparent},
-    {'name': 'Romance', 'imageAsset': 'assets/senpaiAssets/dm.jpg', 'color': Colors.transparent},
-    {'name': 'Sci-Fi', 'imageAsset': 'assets/senpaiAssets/sg.jpg', 'color': Colors.transparent},
-    {'name': 'Slice of Life', 'imageAsset': 'assets/senpaiAssets/fr.jpg', 'color': Colors.transparent},
+    {
+      'name': 'Action',
+      'imageAsset': 'assets/senpaiAssets/solo2.png',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Adventure',
+      'imageAsset': 'assets/senpaiAssets/op.png',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Comedy',
+      'imageAsset': 'assets/senpaiAssets/dd.png',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Drama',
+      'imageAsset': 'assets/senpaiAssets/cg.jpg',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Fantasy',
+      'imageAsset': 'assets/senpaiAssets/rz.png',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Horror',
+      'imageAsset': 'assets/senpaiAssets/tg.jpg',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Mystery',
+      'imageAsset': 'assets/senpaiAssets/er.jpg',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Romance',
+      'imageAsset': 'assets/senpaiAssets/dm.jpg',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Sci-Fi',
+      'imageAsset': 'assets/senpaiAssets/sg.jpg',
+      'color': Colors.transparent,
+    },
+    {
+      'name': 'Slice of Life',
+      'imageAsset': 'assets/senpaiAssets/fr.jpg',
+      'color': Colors.transparent,
+    },
   ];
 
   @override
@@ -43,20 +83,28 @@ class _SearchScreenState extends State<SenpaiSearch>
 
     _opacityAnimations = List.generate(
       _genres.length,
-          (index) => Tween<double>(begin: 0.0, end: 1.0).animate(
+      (index) => Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
           parent: _animationController,
-          curve: Interval(index * 0.08, (index * 0.08) + 0.28, curve: Curves.easeOut),
+          curve: Interval(
+            index * 0.08,
+            (index * 0.08) + 0.28,
+            curve: Curves.easeOut,
+          ),
         ),
       ),
     );
 
     _slideAnimations = List.generate(
       _genres.length,
-          (index) => Tween<double>(begin: 50.0, end: 0.0).animate(
+      (index) => Tween<double>(begin: 50.0, end: 0.0).animate(
         CurvedAnimation(
           parent: _animationController,
-          curve: Interval(index * 0.08, (index * 0.08) + 0.28, curve: Curves.easeOut),
+          curve: Interval(
+            index * 0.08,
+            (index * 0.08) + 0.28,
+            curve: Curves.easeOut,
+          ),
         ),
       ),
     );
@@ -119,13 +167,19 @@ class _SearchScreenState extends State<SenpaiSearch>
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
-                  style: GoogleFonts.urbanist(color: Colors.white, fontSize: 16),
+                  style: GoogleFonts.urbanist(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Search anime...',
                     hintStyle: GoogleFonts.urbanist(color: Colors.grey[400]),
                     prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
                   ),
                 ),
               ),
@@ -185,15 +239,17 @@ class _SearchScreenState extends State<SenpaiSearch>
           children: [
             isNetworkImage
                 ? Image.network(
-              imageAssetPath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => _imageErrorPlaceholder(),
-            )
+                  imageAssetPath,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) => _imageErrorPlaceholder(),
+                )
                 : Image.asset(
-              imageAssetPath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => _imageErrorPlaceholder(),
-            ),
+                  imageAssetPath,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) => _imageErrorPlaceholder(),
+                ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

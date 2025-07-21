@@ -28,16 +28,20 @@ class SenpaiDetailsScreen extends StatelessWidget {
             children: [
               // Header
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    anime.title,
-                    style: GoogleFonts.urbanist(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      anime.title,
+                      style: GoogleFonts.urbanist(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
                   const Icon(Icons.more_vert, color: Colors.white),
                 ],
               ),

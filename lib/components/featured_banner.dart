@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../models/anime_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/anime_detail_model.dart';
-
 import '../screens/senpai_details_screen.dart';
 
 class FeaturedBanner extends StatelessWidget {
@@ -26,7 +25,10 @@ class FeaturedBanner extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Container(
-                color: Colors.grey[900],
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: const Center(
                   child: Icon(Icons.error, color: Colors.red, size: 48),
                 ),
@@ -66,102 +68,105 @@ class FeaturedBanner extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (_) => SenpaiDetailsScreen(
-                                      anime: AnimeModel(
-                                        title: anime.title,
-                                        genre: anime.genre ?? 'Unknown',
-                                        imagePath: anime.imageUrl,
-                                        synopsis:
-                                            anime.synopsis ??
-                                            'No synopsis available.',
-                                        releaseDate:
-                                            anime.releaseDate ?? 'Unknown',
-                                        starring: anime.starring ?? 'N/A',
-                                      ),
-                                    ),
+                                builder: (_) => SenpaiDetailsScreen(
+                                  anime: AnimeModel(
+                                    title: anime.title,
+                                    genre: anime.genre ?? 'Unknown',
+                                    imagePath: anime.imageUrl,
+                                    synopsis:
+                                    anime.synopsis ?? 'No synopsis available.',
+                                    releaseDate:
+                                    anime.releaseDate ?? 'Unknown',
+                                    starring: anime.starring ?? 'N/A',
+                                  ),
+                                ),
                               ),
                             );
                           },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Stack(
-                              children: [
-                                Hero(
-                                  tag: anime.imageUrl,
-                                  child: Image.network(
-                                    anime.imageUrl,
-                                    height: 400,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (
-                                      context,
-                                      child,
-                                      loadingProgress,
-                                    ) {
-                                      if (loadingProgress == null) return child;
-                                      return Container(
-                                        color: Colors.grey[900],
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value:
-                                                loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.tealAccent.withOpacity(0.5),
+                                width: .5,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Stack(
+                                children: [
+                                  Hero(
+                                    tag: anime.imageUrl,
+                                    child: Image.network(
+                                      anime.imageUrl,
+                                      height: 400,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Container(
+                                          color: Colors.grey[900],
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress
+                                                  .expectedTotalBytes !=
+                                                  null
+                                                  ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                                  : null,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Container(
-                                              color: Colors.grey[900],
-                                              child: const Center(
-                                                child: Icon(
-                                                  Icons.broken_image,
-                                                  color: Colors.grey,
-                                                ),
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                          Container(
+                                            color: Colors.grey[900],
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey,
                                               ),
                                             ),
-                                  ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.black.withOpacity(0.7),
-                                      ],
+                                          ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  bottom: 16,
-                                  left: 16,
-                                  child: Text(
-                                    anime.title.toUpperCase(),
-                                    style: GoogleFonts.urbanist(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      shadows: [
-                                        Shadow(
-                                          blurRadius: 10,
-                                          color: Colors.black,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.7),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Positioned(
+                                    bottom: 16,
+                                    left: 16,
+                                    child: Text(
+                                      anime.title.toUpperCase(),
+                                      style: GoogleFonts.urbanist(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          Shadow(
+                                            blurRadius: 10,
+                                            color: Colors.black,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -190,7 +195,7 @@ class FeaturedBanner extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: () {},
-                        icon: FaIcon(Icons.search_rounded),
+                        icon: const FaIcon(Icons.search_rounded),
                         color: Colors.white,
                       ),
                       IconButton(

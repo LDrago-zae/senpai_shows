@@ -51,17 +51,12 @@ class _MainNavigationState extends State<MainNavigation> {
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+        padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(32),
-          child: Material(
-            elevation: 10,
-            borderRadius: BorderRadius.circular(32),
-            color: Colors.transparent,
-            child: CustomBottomNav(
-              selectedIndex: _selectedIndex,
-              onItemTapped: _onItemTapped,
-            ),
+          child: CustomBottomNav(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
           ),
         ),
       ),

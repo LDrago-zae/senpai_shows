@@ -16,16 +16,20 @@ class CustomBottomNav extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xff01968B),
+          color: Color.fromARGB(18,20,25,255),
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(64),
             bottom: Radius.circular(24),
           ),
+          border: Border.all(
+            color: Colors.tealAccent.withOpacity(0.5),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.7),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black,
+              // blurRadius: 10,
+              // offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -33,7 +37,7 @@ class CustomBottomNav extends StatelessWidget {
           height: 65,
           margin: const EdgeInsets.all(1.5),
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: Colors.black.withOpacity(0.2),
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(64),
               bottom: Radius.circular(24),

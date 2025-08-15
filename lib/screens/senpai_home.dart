@@ -43,12 +43,15 @@ class _SenpaiHomeState extends State<SenpaiHome> {
     // Scroll to the bottom after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
+        _scrollController.jumpTo(0); // Start from top
       }
+      // if (_scrollController.hasClients) {  
+      //   _scrollController.animateTo(
+      //     _scrollController.position.maxScrollExtent,
+      //     duration: const Duration(milliseconds: 300),
+      //     curve: Curves.easeInOut,
+      //   );
+      // }
     });
   }
 
@@ -87,7 +90,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
       body: Stack(
         children: [
           const LightBlackGlassmorphicContainer(
-            blurStrength: 6.0,
+            blurStrength: 16.0,
             borderRadius: 16.0,
             padding: EdgeInsets.all(16.0),
             child: SizedBox.expand(),

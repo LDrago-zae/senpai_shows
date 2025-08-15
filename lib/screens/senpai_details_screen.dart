@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/anime_detail_model.dart';
@@ -124,28 +125,38 @@ class SenpaiDetailsScreen extends StatelessWidget {
                   Text(
                     "Release date",
                     style: GoogleFonts.urbanist(
-                      color: Colors.grey[400],
-                      fontSize: 16,
+                      color: Colors.white,
+                      fontSize: 20,
                     ),
                   ),
-                  ElevatedButton(
+                  OutlinedButton.icon(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.tealAccent[400],
-                      foregroundColor: Colors.black,
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.tealAccent[400],
                       shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.tealAccent, width: 1.5),
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text("Download"),
+                    icon: SvgPicture.asset(
+                      'assets/icons/dbutton.svg',
+                      width: 18,
+                      height: 18,
+                      colorFilter: ColorFilter.mode(
+                        Colors.tealAccent[400]!,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    label: const Text("Download"),
                   ),
                 ],
               ),
               Text(
                 anime.releaseDate,
                 style: GoogleFonts.urbanist(
-                  color: Colors.white,
-                  fontSize: 16,
+                  color: Colors.grey[400],
+                  fontSize: 12,
                 ),
               ),
 

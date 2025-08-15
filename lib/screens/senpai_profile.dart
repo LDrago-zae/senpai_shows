@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:senpai_shows/components/anime_particle_background.dart';
+import 'package:senpai_shows/firebase/senpai_auth.dart';
+import 'package:senpai_shows/screens/senpai_login.dart';
+import 'package:senpai_shows/screens/senpai_splash.dart';
+import 'package:senpai_shows/components/slide_animation.dart';
 
 class SenpaiProfile extends StatefulWidget {
   const SenpaiProfile({super.key});
@@ -48,7 +52,6 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
-              // TODO: Navigate to edit profile
               _showEditProfile();
             },
           ),
@@ -68,16 +71,12 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  // Profile Header
                   _buildProfileHeader(),
                   const SizedBox(height: 24),
-                  // Stats Cards
                   _buildStatsCards(),
                   const SizedBox(height: 24),
-                  // Settings Section
                   _buildSettingsSection(),
                   const SizedBox(height: 24),
-                  // Action Buttons
                   _buildActionButtons(),
                 ],
               ),
@@ -103,7 +102,6 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       ),
       child: Column(
         children: [
-          // Avatar
           Stack(
             children: [
               CircleAvatar(
@@ -251,35 +249,35 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
             'Account Settings',
             Icons.settings,
             Colors.blueAccent,
-            () => _showComingSoon('Account Settings'),
+                () => _showComingSoon('Account Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Notification Preferences',
             Icons.notifications,
             Colors.orangeAccent,
-            () => _showComingSoon('Notification Settings'),
+                () => _showComingSoon('Notification Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Download Settings',
             Icons.download,
             Colors.greenAccent,
-            () => _showComingSoon('Download Settings'),
+                () => _showComingSoon('Download Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Privacy & Security',
             Icons.security,
             Colors.purpleAccent,
-            () => _showComingSoon('Privacy Settings'),
+                () => _showComingSoon('Privacy Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Help & Support',
             Icons.help,
             Colors.tealAccent,
-            () => _showComingSoon('Help Center'),
+                () => _showComingSoon('Help Center'),
           ),
         ],
       ),
@@ -408,15 +406,42 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement sign out logic
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Signed out successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+            onPressed: () async {
+              setState(() => _loading = true);
+              try {
+                await SenpaiAuth().signOut();
+                if (mounted) {
+                  Navigator.pop(context); // Close dialog
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Signed out successfully'),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      backgroundColor: const Color(0xFF4ECDC4),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    SlideAnimation(
+                      page: const SenpaiLogin(),
+                      direction: AxisDirection.left,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Sign-out failed: $e'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              } finally {
+                if (mounted) {
+                  setState(() => _loading = false);
+                }
+              }
             },
             child: const Text('Sign Out', style: TextStyle(color: Colors.redAccent)),
           ),

@@ -15,9 +15,10 @@ class FeaturedBanner extends StatelessWidget {
     final pageController = PageController();
 
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 45.0),
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 25.0),
       child: SizedBox(
         height: 400,
+        width: double.infinity,
         child: FutureBuilder<List<Anime>>(
           future: fetchAnime,
           builder: (context, snapshot) {
@@ -27,7 +28,7 @@ class FeaturedBanner extends StatelessWidget {
               return Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Center(
                   child: Icon(Icons.error, color: Colors.red, size: 48),
@@ -39,7 +40,7 @@ class FeaturedBanner extends StatelessWidget {
                 child: const Center(
                   child: Text(
                     'No anime found',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Color(0xffdbe6ff)),
                   ),
                 ),
               );
@@ -68,18 +69,20 @@ class FeaturedBanner extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => SenpaiDetailsScreen(
-                                  anime: AnimeModel(
-                                    title: anime.title,
-                                    genre: anime.genre ?? 'Unknown',
-                                    imagePath: anime.imageUrl,
-                                    synopsis:
-                                    anime.synopsis ?? 'No synopsis available.',
-                                    releaseDate:
-                                    anime.releaseDate ?? 'Unknown',
-                                    starring: anime.starring ?? 'N/A',
-                                  ),
-                                ),
+                                builder:
+                                    (_) => SenpaiDetailsScreen(
+                                      anime: AnimeModel(
+                                        title: anime.title,
+                                        genre: anime.genre ?? 'Unknown',
+                                        imagePath: anime.imageUrl,
+                                        synopsis:
+                                            anime.synopsis ??
+                                            'No synopsis available.',
+                                        releaseDate:
+                                            anime.releaseDate ?? 'Unknown',
+                                        starring: anime.starring ?? 'N/A',
+                                      ),
+                                    ),
                               ),
                             );
                           },
@@ -102,36 +105,41 @@ class FeaturedBanner extends StatelessWidget {
                                       height: 400,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child;
+                                      loadingBuilder: (
+                                        context,
+                                        child,
+                                        loadingProgress,
+                                      ) {
+                                        if (loadingProgress == null)
+                                          return child;
                                         return Container(
                                           color: Colors.grey[900],
                                           child: Center(
                                             child: CircularProgressIndicator(
-                                              value: loadingProgress
-                                                  .expectedTotalBytes !=
-                                                  null
-                                                  ? loadingProgress
-                                                  .cumulativeBytesLoaded /
+                                              value:
                                                   loadingProgress
-                                                      .expectedTotalBytes!
-                                                  : null,
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
                                             ),
                                           ),
                                         );
                                       },
                                       errorBuilder:
                                           (context, error, stackTrace) =>
-                                          Container(
-                                            color: Colors.grey[900],
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.broken_image,
-                                                color: Colors.grey,
+                                              Container(
+                                                color: Colors.grey[900],
+                                                child: const Center(
+                                                  child: Icon(
+                                                    Icons.broken_image,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ),
                                     ),
                                   ),
                                   Container(
@@ -152,7 +160,7 @@ class FeaturedBanner extends StatelessWidget {
                                     child: Text(
                                       anime.title.toUpperCase(),
                                       style: GoogleFonts.urbanist(
-                                        color: Colors.white,
+                                        color: Color(0xffdbe6ff),
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                         shadows: [
@@ -253,7 +261,7 @@ class PageIndicator extends StatelessWidget {
         final currentPage = controller.page?.round() ?? 0;
         return Text(
           '${currentPage + 1}/$itemCount',
-          style: const TextStyle(color: Colors.white, fontSize: 12),
+          style: const TextStyle(color: Color(0xffdbe6ff), fontSize: 12),
         );
       },
     );

@@ -10,6 +10,8 @@ import 'package:senpai_shows/models/anime_model.dart';
 import 'package:senpai_shows/database/image_cache_helper.dart';
 import 'dart:typed_data';
 
+import '../components/trending_cards.dart';
+
 class SenpaiHome extends StatefulWidget {
   const SenpaiHome({super.key});
 
@@ -86,7 +88,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(18,20,25,255),
+      backgroundColor: Color.fromARGB(18, 20, 25, 255),
       extendBody: true,
       body: Stack(
         children: [
@@ -98,116 +100,130 @@ class _SenpaiHomeState extends State<SenpaiHome> {
           // ),
           SingleChildScrollView(
             controller: _scrollController,
-            padding: const EdgeInsets.only(bottom: 80.0),
-            child: Column(
-              children: [
-                FeaturedBanner(fetchAnime: _homeController.fetchForYouAnime()),
-                const SizedBox(height: 16),
-
-                // Random Anime Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 12,
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  FeaturedBanner(
+                    fetchAnime: _homeController.fetchRecentAnime(),
                   ),
-                  child: ElevatedButton(
-                    onPressed: _loadingRandomAnime ? null : _fetchRandomAnime,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(18,20,25,255),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                  const SizedBox(height: 16),
+
+                  // Random Anime Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _loadingRandomAnime ? null : _fetchRandomAnime,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(18, 20, 25, 255),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                        side: BorderSide(
+                          color: Colors.tealAccent.withOpacity(0.5),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                      side: BorderSide(
-                        color: Colors.tealAccent.withOpacity(0.5),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.shuffle, color: Colors.tealAccent),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Randomize Your Show Today',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.tealAccent,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
+
+                  // Random Anime Card
+                  if (_loadingRandomAnime)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: CircularProgressIndicator(
+                        color: Colors.tealAccent,
+                      ),
+                    )
+                  else if (_randomAnimeError != null)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        _randomAnimeError!,
+                        style: GoogleFonts.urbanist(
+                          color: Colors.redAccent,
+                          fontSize: 14,
+                        ),
+                      ),
+                    )
+                  else if (_randomAnime != null)
+                    RandomAnimeCard(anime: _randomAnime!),
+
+                  // Trending Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12,
+                    ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(Icons.shuffle, color: Colors.tealAccent),
-                        const SizedBox(width: 8),
                         Text(
-                          'Randomize Your Show Today',
+                          'Trending',
                           style: GoogleFonts.urbanist(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: Color(0xffdbe6ff),
+                          ),
+                        ),
+                        Text(
+                          'See all',
+                          style: GoogleFonts.urbanist(
                             color: Colors.tealAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
 
-                // Random Anime Card
-                if (_loadingRandomAnime)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(color: Colors.tealAccent),
-                  )
-                else if (_randomAnimeError != null)
+                  // Trending horizontal list
+                  TrendingCards(),
+                  // For You Header
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      _randomAnimeError!,
-                      style: GoogleFonts.urbanist(
-                        color: Colors.redAccent,
-                        fontSize: 14,
-                      ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 16,
                     ),
-                  )
-                else if (_randomAnime != null)
-                  RandomAnimeCard(anime: _randomAnime!),
-
-                // Trending Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Trending',
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'For You',
                         style: GoogleFonts.urbanist(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xffdbe6ff),
                         ),
                       ),
-                      Text(
-                        'See all',
-                        style: GoogleFonts.urbanist(
-                          color: Colors.tealAccent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
 
-                // Trending horizontal list
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  height: 220,
-                  child: FutureBuilder<List<Anime>>(
-                    future: _homeController.fetchTrendingAnime(),
+                  // For You Bento-Style Grid
+                  FutureBuilder<List<Anime>>(
+                    future: _homeController.fetchForYouAnime(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -216,220 +232,73 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                       }
 
                       final animeList = snapshot.data!;
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: animeList.length,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        itemBuilder: (context, index) {
-                          final anime = animeList[index];
-                          return Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            width: 130,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.tealAccent.withOpacity(0.5),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Stack(
-                                children: [
-                                  CachedOrNetworkImage(
-                                    id: anime.id.toString(),
-                                    imageUrl: anime.imageUrl,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black.withOpacity(0.8),
-                                          ],
-                                        ),
-                                      ),
-                                      child: Text(
-                                        anime.title,
-                                        style: const TextStyle(
-                                          color: Color(0xffdbe6ff),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    left: 8,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.tealAccent,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        '${index + 1}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: BentoGrid(animeList: animeList),
                       );
                     },
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  // For You Anime Cards
+                  FutureBuilder<List<Anime>>(
+                    future: _homeController.fetchTrendingAnime(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.0),
+                          // Add some vertical padding
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.tealAccent,
+                            ),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Text(
+                              'Failed to load "For You" anime: ${snapshot.error}',
+                              style: GoogleFonts.urbanist(
+                                color: Colors.redAccent,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Text(
+                              'No "For You" anime available.',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        );
+                      }
 
-                // For You Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 16,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'For You',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffdbe6ff),
-                      ),
-                    ),
-                  ),
-                ),
+                      final List<Anime> animeList = snapshot.data!;
 
-                // For You Bento-Style Grid
-                FutureBuilder<List<Anime>>(
-                  future: _homeController.fetchForYouAnime(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-
-                    final animeList = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: BentoGrid(animeList: animeList),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                // For You Anime Cards
-                FutureBuilder<List<Anime>>(
-                  future: _homeController.fetchTrendingAnime(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20.0), // Add some vertical padding
-                        child: Center(child: CircularProgressIndicator(color: Colors.tealAccent)),
-                      );
-                    } else if (snapshot.hasError) {
                       return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Center(
-                          child: Text(
-                            'Failed to load "For You" anime: ${snapshot.error}',
-                            style: GoogleFonts.urbanist(color: Colors.redAccent),
-                            textAlign: TextAlign.center,
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          // Crucial for nested scrolling
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: animeList.length,
+                          itemBuilder: (context, index) {
+                            final Anime anime = animeList[index];
+                            return SenpaiAnimeCard(
+                              anime: anime,
+                            ); // Use your new card widget
+                          },
                         ),
                       );
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Center(
-                          child: Text(
-                            'No "For You" anime available.',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                      );
-                    }
-
-                    final List<Anime> animeList = snapshot.data!;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: ListView.builder(
-                        shrinkWrap: true, // Crucial for nested scrolling
-                        physics: const NeverScrollableScrollPhysics(), // Disable internal scrolling
-                        // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        //   crossAxisCount: 2, // Two cards per row
-                        //   crossAxisSpacing: 16, // Horizontal gap between cards
-                        //   mainAxisSpacing: 16, // Vertical gap between cards
-                        //   // Adjust this ratio if your cards look too tall or short
-                        //   childAspectRatio: 0.65, // Width / Height ratio of each card
-                        // ),
-                        itemCount: animeList.length,
-                        itemBuilder: (context, index) {
-                          final Anime anime = animeList[index];
-                          return SenpaiAnimeCard(anime: anime); // Use your new card widget
-                        },
-                      ),
-                    );
-                  },
-                ),
-
-
-
-                // FutureBuilder<List<Anime>>(
-                //   future: featuredAnimeFuture,
-                //   builder: (context, snapshot) {
-                //     if (snapshot.connectionState == ConnectionState.waiting) {
-                //       return const Center(child: CircularProgressIndicator());
-                //     } else if (snapshot.hasError) {
-                //       return Center(child: Text('Error: ${snapshot.error}'));
-                //     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                //       return Column(
-                //         children: snapshot.data!.take(2).map((anime) =>
-                //             Padding(
-                //               padding: const EdgeInsets.only(bottom: 16),
-                //               child: SenpaiAnimeCard(anime: anime),
-                //             )
-                //         ).toList(),
-                //       );
-                //     }
-                //     return const SizedBox.shrink();
-                //   },
-                // ),
-              ],
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],

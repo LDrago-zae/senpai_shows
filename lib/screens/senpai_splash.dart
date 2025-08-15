@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:senpai_shows/firebase/senpai_auth.dart';
+import 'package:senpai_shows/layout/main_navigation.dart';
 import 'package:senpai_shows/screens/senpai_login.dart';
-
 import '../components/slide_animation.dart';
 
 class SenpaiSplash extends StatefulWidget {
@@ -10,11 +11,11 @@ class SenpaiSplash extends StatefulWidget {
   SenpaiSplashState createState() => SenpaiSplashState();
 }
 
-class SenpaiSplashState extends State<SenpaiSplash>
-    with SingleTickerProviderStateMixin {
+class SenpaiSplashState extends State<SenpaiSplash> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;
+  final SenpaiAuth _auth = SenpaiAuth();
 
   @override
   void initState() {
@@ -35,8 +36,41 @@ class SenpaiSplashState extends State<SenpaiSplash>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
-    _controller.forward(); // Start animations only
-    // Removed auto-navigation logic
+    _controller.forward().then((_) => _navigateAfterAnimation());
+  }
+
+  Future<void> _navigateAfterAnimation() async {
+    if (!mounted) return;
+
+    try {
+      // Check if user is signed in with Google
+      if (_auth.currentUser != null && _auth.isGoogleSignIn()) {
+        Navigator.pushReplacement(
+          context,
+          SlideAnimation(
+            page: const MainNavigation(),
+            direction: AxisDirection.right,
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          SlideAnimation(
+            page: const SenpaiLogin(),
+            direction: AxisDirection.up,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Auth check error: $e');
+      Navigator.pushReplacement(
+        context,
+        SlideAnimation(
+          page: const SenpaiLogin(),
+          direction: AxisDirection.up,
+        ),
+      );
+    }
   }
 
   @override
@@ -61,7 +95,7 @@ class SenpaiSplashState extends State<SenpaiSplash>
               ),
             ),
             child: Container(
-              color: Colors.black.withValues(alpha:0.4),
+              color: Colors.black.withValues(alpha: 0.4),
             ),
           ),
 
@@ -110,14 +144,9 @@ class SenpaiSplashState extends State<SenpaiSplash>
                 },
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigation happens ONLY when button is pressed
-                    Navigator.push(
-                      context,
-                      SlideAnimation(
-                        page: const SenpaiLogin(),
-                        direction: AxisDirection.up,
-                      ),
-                    );
+                    // Stop animation and navigate immediately
+                    _controller.stop();
+                    _navigateAfterAnimation();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4ECDC4),
@@ -131,7 +160,7 @@ class SenpaiSplashState extends State<SenpaiSplash>
                       ),
                     ),
                     elevation: 4,
-                    shadowColor: const Color(0xFF4ECDC4).withValues(alpha:0.5),
+                    shadowColor: const Color(0xFF4ECDC4).withValues(alpha: 0.5),
                   ),
                   child: const Text(
                     'Get Started',

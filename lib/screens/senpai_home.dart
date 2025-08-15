@@ -88,7 +88,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(18, 20, 25, 255),
+      backgroundColor: Color.fromARGB(38, 10, 10, 255),
       extendBody: true,
       body: Stack(
         children: [

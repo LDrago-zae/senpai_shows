@@ -12,8 +12,22 @@ class SenpaiDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color.fromARGB(38, 10, 10, 255),
+      // Extend body behind the app bar for a full-screen effect
+      // This allows the content to go under the AppBar
+      // Useful for a more immersive design
+      extendBodyBehindAppBar: false,
+      resizeToAvoidBottomInset: false,
+      // AppBar with transparent background
       appBar: AppBar(
+        title: Text(
+          "Details",
+          style: GoogleFonts.urbanist(
+            color: Color(0xffdbe6ff),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -34,7 +48,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                     child: Text(
                       anime.title,
                       style: GoogleFonts.urbanist(
-                        color: Colors.white,
+                        color: Color(0xffdbe6ff),
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -43,7 +57,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.more_vert, color: Colors.white),
+                  const Icon(Icons.more_vert, color: Color(0xffdbe6ff),),
                 ],
               ),
               const SizedBox(height: 16),
@@ -61,7 +75,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) => Container(
                       color: Colors.grey[900],
                       height: 280,
-                      child: const Icon(Icons.broken_image, color: Colors.white),
+                      child: const Icon(Icons.broken_image, color: Color(0xffdbe6ff),),
                     ),
                   ),
                 ),
@@ -73,7 +87,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                 anime.title,
                 style: GoogleFonts.urbanist(
                   fontSize: 24,
-                  color: Colors.white,
+                  color: Color(0xffdbe6ff),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -81,7 +95,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                 anime.genre,
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: Colors.grey[400],
+                  color: Color(0xffdbe6ff),
                 ),
               ),
               const SizedBox(height: 12),
@@ -104,7 +118,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
+                      foregroundColor: Color(0xffdbe6ff),
                       side: const BorderSide(color: Colors.white24),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -112,7 +126,9 @@ class SenpaiDetailsScreen extends StatelessWidget {
                     ),
                     onPressed: () {},
                     icon: const Icon(Icons.add),
-                    label: const Text("My List"),
+                    label: const Text("My List",
+                      style: TextStyle(color: Color(0xffdbe6ff)),
+                    ),
                   ),
                 ],
               ),
@@ -125,7 +141,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
                   Text(
                     "Release date",
                     style: GoogleFonts.urbanist(
-                      color: Colors.white,
+                      color: Color(0xffdbe6ff),
                       fontSize: 20,
                     ),
                   ),
@@ -148,14 +164,19 @@ class SenpaiDetailsScreen extends StatelessWidget {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: const Text("Download"),
+                    label: const Text("Download",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xffdbe6ff),
+                      ),
+                    ),
                   ),
                 ],
               ),
               Text(
                 anime.releaseDate,
                 style: GoogleFonts.urbanist(
-                  color: Colors.grey[400],
+                  color: Color(0xffdbe6ff),
                   fontSize: 12,
                 ),
               ),
@@ -166,7 +187,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
               Text(
                 "Synopsis",
                 style: GoogleFonts.urbanist(
-                  color: Colors.white,
+                  color: Color(0xffdbe6ff),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -175,7 +196,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
               Text(
                 anime.synopsis,
                 style: GoogleFonts.urbanist(
-                  color: Colors.grey[300],
+                  color: Color(0xffdbe6ff),
                   fontSize: 14,
                 ),
               ),
@@ -185,7 +206,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
               Text(
                 "Starring: ${anime.starring}",
                 style: GoogleFonts.urbanist(
-                  color: Colors.tealAccent[100],
+                  color: Color(0xffdbe6ff),
                   fontSize: 14,
                 ),
               ),
@@ -195,7 +216,7 @@ class SenpaiDetailsScreen extends StatelessWidget {
               Text(
                 "Episodes",
                 style: GoogleFonts.urbanist(
-                  color: Colors.white,
+                  color: Color(0xffdbe6ff),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),

@@ -53,6 +53,7 @@ dependencies:
   cached_network_image: ^3.4.1
   jikan_api: ^2.2.1
   shared_preferences: any
+  visibility_detector: ^0.4.0+2
 
 
 dev_dependencies:

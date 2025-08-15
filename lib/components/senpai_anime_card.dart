@@ -5,27 +5,85 @@ import 'package:senpai_shows/screens/senpai_details_screen.dart';
 import '../models/anime_model.dart';
 import '../screens/senpai_home.dart';
 
-class SenpaiAnimeCard extends StatelessWidget {
+class SenpaiAnimeCard extends StatefulWidget {
   final Anime anime;
+  final int index;
+  final AnimationController animationController;
 
-  const SenpaiAnimeCard({super.key, required this.anime});
+  const SenpaiAnimeCard({
+    super.key,
+    required this.anime,
+    required this.index,
+    required this.animationController,
+  });
+
+  @override
+  State<SenpaiAnimeCard> createState() => _SenpaiAnimeCardState();
+}
+
+class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> {
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    // Define opacity animation
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: widget.animationController,
+        curve: Interval(
+          widget.index * 0.08,
+          (widget.index * 0.08) + 0.28,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+
+    // Define slide animation
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: widget.animationController,
+        curve: Interval(
+          widget.index * 0.08,
+          (widget.index * 0.08) + 0.28,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: widget.animationController,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _opacityAnimation.value,
+          child: Transform.translate(
+            offset: Offset(0, _slideAnimation.value),
+            child: child,
+          ),
+        );
+      },
+      child: _buildAnimeCard(context),
+    );
+  }
+
+  Widget _buildAnimeCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder:
-                (context) => SenpaiDetailsScreen(
+            builder: (context) => SenpaiDetailsScreen(
               anime: AnimeModel(
-                title: anime.title,
-                genre: anime.genre ?? 'Unknown',
-                imagePath: anime.imageUrl,
-                synopsis: anime.synopsis ?? 'No synopsis available.',
-                releaseDate: anime.releaseDate ?? 'Unknown',
-                starring: anime.starring ?? 'N/A',
+                title: widget.anime.title,
+                genre: widget.anime.genre ?? 'Unknown',
+                imagePath: widget.anime.imageUrl,
+                synopsis: widget.anime.synopsis ?? 'No synopsis available.',
+                releaseDate: widget.anime.releaseDate ?? 'Unknown',
+                starring: widget.anime.starring ?? 'N/A',
               ),
             ),
           ),
@@ -39,7 +97,7 @@ class SenpaiAnimeCard extends StatelessWidget {
             color: Colors.tealAccent.withOpacity(0.5),
             width: 1,
           ),
-          color: Color.fromARGB(18,20,25,255),
+          color: const Color.fromARGB(18, 20, 25, 255),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -51,11 +109,17 @@ class SenpaiAnimeCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CachedOrNetworkImage(
-                  id: anime.id.toString(),
-                  imageUrl: anime.imageUrl,
+                  id: widget.anime.id.toString(),
+                  imageUrl: widget.anime.imageUrl,
                   width: 150,
                   height: 200,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 150,
+                    height: 200,
+                    color: Colors.grey[800],
+                    child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                  ),
                 ),
               ),
             ),
@@ -67,22 +131,22 @@ class SenpaiAnimeCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Status Badge
-                    if (anime.status != null)
+                    if (widget.anime.status != null)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: anime.status == 'Airing'
+                            color: widget.anime.status == 'Airing'
                                 ? Colors.green
-                                : anime.status == 'Finished'
-                                    ? Colors.blue
-                                    : Colors.red,
+                                : widget.anime.status == 'Finished'
+                                ? Colors.blue
+                                : Colors.red,
                           ),
                         ),
                         child: Text(
-                          anime.status!,
+                          widget.anime.status!,
                           style: GoogleFonts.urbanist(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -91,10 +155,9 @@ class SenpaiAnimeCard extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: 6),
-
                     // Title
                     Text(
-                      anime.title,
+                      widget.anime.title,
                       style: GoogleFonts.urbanist(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -104,22 +167,21 @@ class SenpaiAnimeCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-
                     // Episodes + Release Date
                     Row(
                       children: [
-                        if (anime.releaseDate != null)
+                        if (widget.anime.releaseDate != null)
                           Text(
-                            anime.releaseDate!,
+                            widget.anime.releaseDate!,
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
                               color: Colors.white70,
                             ),
                           ),
-                        if (anime.episodes != null) ...[
+                        if (widget.anime.episodes != null) ...[
                           const SizedBox(width: 8),
                           Text(
-                            '${anime.episodes} eps',
+                            '${widget.anime.episodes} eps',
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
                               color: Colors.white70,
@@ -129,23 +191,22 @@ class SenpaiAnimeCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-
                     // Rating + Rank
                     Row(
                       children: [
                         const Icon(Icons.star, color: Colors.amber, size: 16),
                         const SizedBox(width: 4),
                         Text(
-                          anime.rating?.toString() ?? 'N/A',
+                          widget.anime.rating?.toString() ?? 'N/A',
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             color: Colors.white,
                           ),
                         ),
-                        if (anime.rank != null) ...[
+                        if (widget.anime.rank != null) ...[
                           const SizedBox(width: 12),
                           Text(
-                            '#${anime.rank}',
+                            '#${widget.anime.rank}',
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               color: Colors.white70,
@@ -155,13 +216,12 @@ class SenpaiAnimeCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-
                     // Genre Tags
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: (anime.genre != null
-                          ? anime.genre!.split(',').map((g) => g.trim()).toList()
+                      children: (widget.anime.genre != null
+                          ? widget.anime.genre!.split(',').map((g) => g.trim()).toList()
                           : [])
                           .map((genre) {
                         return Container(
@@ -179,7 +239,7 @@ class SenpaiAnimeCard extends StatelessWidget {
                           ),
                         );
                       }).toList(),
-                    )
+                    ),
                   ],
                 ),
               ),

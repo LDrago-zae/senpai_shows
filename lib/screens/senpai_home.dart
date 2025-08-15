@@ -8,9 +8,11 @@ import 'package:senpai_shows/components/senpai_anime_card.dart';
 import 'package:senpai_shows/controllers/home_controller.dart';
 import 'package:senpai_shows/models/anime_model.dart';
 import 'package:senpai_shows/database/image_cache_helper.dart';
+import 'package:senpai_shows/screens/senpai_details_screen.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:typed_data';
-
 import '../components/trending_cards.dart';
+import '../models/anime_detail_model.dart';
 
 class SenpaiHome extends StatefulWidget {
   const SenpaiHome({super.key});
@@ -19,7 +21,7 @@ class SenpaiHome extends StatefulWidget {
   State<SenpaiHome> createState() => _SenpaiHomeState();
 }
 
-class _SenpaiHomeState extends State<SenpaiHome> {
+class _SenpaiHomeState extends State<SenpaiHome> with SingleTickerProviderStateMixin {
   final HomeController _homeController = HomeController();
   final ScrollController _scrollController = ScrollController();
 
@@ -37,24 +39,18 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   void initState() {
     super.initState();
+    // Initialize futures
     popularAnimeFuture = _homeController.fetchPopularAnime();
     recentAnimeFuture = _homeController.fetchRecentAnime();
     shikimoriPopularAnimeFuture = _homeController.fetchShikimoriPopularAnime();
     shikimoriRecentAnimeFuture = _homeController.fetchShikimoriRecentAnime();
     featuredAnimeFuture = _homeController.fetchFeaturedAnime();
 
-    // Scroll to the bottom after the first frame
+    // Scroll to the top after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.jumpTo(0); // Start from top
+        _scrollController.jumpTo(0);
       }
-      // if (_scrollController.hasClients) {
-      //   _scrollController.animateTo(
-      //     _scrollController.position.maxScrollExtent,
-      //     duration: const Duration(milliseconds: 300),
-      //     curve: Curves.easeInOut,
-      //   );
-      // }
     });
   }
 
@@ -88,16 +84,10 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(38, 10, 10, 255),
+      backgroundColor: const Color.fromARGB(38, 10, 10, 255),
       extendBody: true,
       body: Stack(
         children: [
-          // const LightBlackGlassmorphicContainer(
-          //   blurStrength: 16.0,
-          //   borderRadius: 16.0,
-          //   padding: EdgeInsets.all(16.0),
-          //   child: SizedBox.expand(),
-          // ),
           SingleChildScrollView(
             controller: _scrollController,
             padding: const EdgeInsets.only(bottom: 30.0),
@@ -118,7 +108,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                     child: ElevatedButton(
                       onPressed: _loadingRandomAnime ? null : _fetchRandomAnime,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(18, 20, 25, 255),
+                        backgroundColor: const Color.fromARGB(18, 20, 25, 255),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -169,7 +159,10 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                       ),
                     )
                   else if (_randomAnime != null)
-                    RandomAnimeCard(anime: _randomAnime!),
+                      RandomAnimeCard(
+                        anime: _randomAnime!,
+                        index: 0, // Single card
+                      ),
 
                   // Trending Header
                   Padding(
@@ -185,7 +178,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                           style: GoogleFonts.urbanist(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xffdbe6ff),
+                            color: const Color(0xffdbe6ff),
                           ),
                         ),
                         Text(
@@ -202,6 +195,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
 
                   // Trending horizontal list
                   TrendingCards(),
+
                   // For You Header
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -215,7 +209,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                         style: GoogleFonts.urbanist(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xffdbe6ff),
+                          color: const Color(0xffdbe6ff),
                         ),
                       ),
                     ),
@@ -239,6 +233,7 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                     },
                   ),
                   const SizedBox(height: 16),
+
                   // For You Anime Cards
                   FutureBuilder<List<Anime>>(
                     future: _homeController.fetchTrendingAnime(),
@@ -246,7 +241,6 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20.0),
-                          // Add some vertical padding
                           child: Center(
                             child: CircularProgressIndicator(
                               color: Colors.tealAccent,
@@ -279,19 +273,18 @@ class _SenpaiHomeState extends State<SenpaiHome> {
                       }
 
                       final List<Anime> animeList = snapshot.data!;
-
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: ListView.builder(
                           shrinkWrap: true,
-                          // Crucial for nested scrolling
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: animeList.length,
                           itemBuilder: (context, index) {
                             final Anime anime = animeList[index];
                             return SenpaiAnimeCard(
+                              index: index,
                               anime: anime,
-                            ); // Use your new card widget
+                            );
                           },
                         ),
                       );
@@ -307,7 +300,476 @@ class _SenpaiHomeState extends State<SenpaiHome> {
   }
 }
 
-// Helper widget to use cached or network image
+// Updated SenpaiAnimeCard with visibility-based animation
+class SenpaiAnimeCard extends StatefulWidget {
+  final Anime anime;
+  final int index;
+
+  const SenpaiAnimeCard({
+    super.key,
+    required this.anime,
+    required this.index,
+  });
+
+  @override
+  State<SenpaiAnimeCard> createState() => _SenpaiAnimeCardState();
+}
+
+class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(
+          widget.index * 0.08,
+          (widget.index * 0.08) + 0.28,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(
+          widget.index * 0.08,
+          (widget.index * 0.08) + 0.28,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VisibilityDetector(
+      key: Key('anime_card_${widget.anime.id}'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.5 && !_animationController.isAnimating && !_animationController.isCompleted) {
+          _animationController.forward();
+        }
+      },
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _opacityAnimation.value,
+            child: Transform.translate(
+              offset: Offset(0, _slideAnimation.value),
+              child: child,
+            ),
+          );
+        },
+        child: _buildAnimeCard(context),
+      ),
+    );
+  }
+
+  Widget _buildAnimeCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SenpaiDetailsScreen(
+              anime: AnimeModel(
+                title: widget.anime.title,
+                genre: widget.anime.genre ?? 'Unknown',
+                imagePath: widget.anime.imageUrl,
+                synopsis: widget.anime.synopsis ?? 'No synopsis available.',
+                releaseDate: widget.anime.releaseDate ?? 'Unknown',
+                starring: widget.anime.starring ?? 'N/A',
+              ),
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.tealAccent.withOpacity(0.5),
+            width: 1,
+          ),
+          color: const Color.fromARGB(18, 20, 25, 255),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Poster
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 5, bottom: 5),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedOrNetworkImage(
+                  id: widget.anime.id.toString(),
+                  imageUrl: widget.anime.imageUrl,
+                  width: 150,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 150,
+                    height: 200,
+                    color: Colors.grey[800],
+                    child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                  ),
+                ),
+              ),
+            ),
+            // Info
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Status Badge
+                    if (widget.anime.status != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: widget.anime.status == 'Airing'
+                                ? Colors.green
+                                : widget.anime.status == 'Finished'
+                                ? Colors.blue
+                                : Colors.red,
+                          ),
+                        ),
+                        child: Text(
+                          widget.anime.status!,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 6),
+                    // Title
+                    Text(
+                      widget.anime.title,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    // Episodes + Release Date
+                    Row(
+                      children: [
+                        if (widget.anime.releaseDate != null)
+                          Text(
+                            widget.anime.releaseDate!,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 13,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        if (widget.anime.episodes != null) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            '${widget.anime.episodes} eps',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 13,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // Rating + Rank
+                    Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          widget.anime.rating?.toString() ?? 'N/A',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (widget.anime.rank != null) ...[
+                          const SizedBox(width: 12),
+                          Text(
+                            '#${widget.anime.rank}',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Genre Tags
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: (widget.anime.genre != null
+                          ? widget.anime.genre!.split(',').map((g) => g.trim()).toList()
+                          : [])
+                          .map((genre) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.tealAccent.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            genre,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 12,
+                              color: Colors.tealAccent,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Updated RandomAnimeCard with visibility-based animation
+class RandomAnimeCard extends StatefulWidget {
+  final Anime anime;
+  final int index;
+
+  const RandomAnimeCard({
+    super.key,
+    required this.anime,
+    required this.index,
+  });
+
+  @override
+  State<RandomAnimeCard> createState() => _RandomAnimeCardState();
+}
+
+class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(
+          widget.index * 0.08,
+          (widget.index * 0.08) + 0.28,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(
+          widget.index * 0.08,
+          (widget.index * 0.08) + 0.28,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VisibilityDetector(
+      key: Key('random_anime_card_${widget.anime.id}'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.5 && !_animationController.isAnimating && !_animationController.isCompleted) {
+          _animationController.forward();
+        }
+      },
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _opacityAnimation.value,
+            child: Transform.translate(
+              offset: Offset(0, _slideAnimation.value),
+              child: child,
+            ),
+          );
+        },
+        child: _buildRandomAnimeCard(context),
+      ),
+    );
+  }
+
+  Widget _buildRandomAnimeCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SenpaiDetailsScreen(
+              anime: AnimeModel(
+                title: widget.anime.title,
+                genre: widget.anime.genre ?? 'Unknown',
+                imagePath: widget.anime.imageUrl,
+                synopsis: widget.anime.synopsis ?? 'No synopsis available.',
+                releaseDate: widget.anime.releaseDate ?? 'Unknown',
+                starring: widget.anime.starring ?? 'N/A',
+              ),
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.3),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              // Background Image with Blur
+              CachedOrNetworkImage(
+                id: widget.anime.id.toString(),
+                imageUrl: widget.anime.imageUrl,
+                width: double.infinity,
+                height: 250,
+                fit: BoxFit.cover,
+                color: Colors.black.withOpacity(0.5),
+                colorBlendMode: BlendMode.darken,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: double.infinity,
+                  height: 250,
+                  color: Colors.grey[800],
+                  child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      widget.anime.title,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xffdbe6ff),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    // Description
+                    Text(
+                      widget.anime.synopsis ?? 'No synopsis available.',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ),
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    // Genre and Release Date
+                    Row(
+                      children: [
+                        if (widget.anime.genre != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.tealAccent.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              widget.anime.genre!,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 12,
+                                color: Colors.tealAccent,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+                        if (widget.anime.releaseDate != null)
+                          Text(
+                            widget.anime.releaseDate!,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// CachedOrNetworkImage (unchanged from your original)
 Widget CachedOrNetworkImage({
   required String id,
   required String imageUrl,
@@ -316,6 +778,7 @@ Widget CachedOrNetworkImage({
   BoxFit? fit,
   Color? color,
   BlendMode? colorBlendMode,
+  Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
 }) {
   return FutureBuilder<Uint8List?>(
     future: ImageCacheHelper().getCachedImage(id),
@@ -328,7 +791,6 @@ Widget CachedOrNetworkImage({
           child: const Center(child: CircularProgressIndicator()),
         );
       } else if (snapshot.hasData && snapshot.data != null) {
-        // Cached image found
         return Image.memory(
           snapshot.data!,
           width: width,
@@ -338,7 +800,6 @@ Widget CachedOrNetworkImage({
           colorBlendMode: colorBlendMode,
         );
       } else {
-        // Not cached, load from network and cache it
         return Image.network(
           imageUrl,
           width: width,
@@ -348,7 +809,6 @@ Widget CachedOrNetworkImage({
           colorBlendMode: colorBlendMode,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) {
-              // Cache the image after it's loaded
               ImageCacheHelper().cacheImage(id, imageUrl);
               return child;
             }
@@ -359,8 +819,8 @@ Widget CachedOrNetworkImage({
               child: const Center(child: CircularProgressIndicator()),
             );
           },
-          errorBuilder:
-              (context, error, stackTrace) => Container(
+          errorBuilder: errorBuilder ??
+                  (context, error, stackTrace) => Container(
                 width: width,
                 height: height,
                 color: Colors.grey,
@@ -370,110 +830,4 @@ Widget CachedOrNetworkImage({
       }
     },
   );
-}
-
-// Random Anime Card Widget
-class RandomAnimeCard extends StatelessWidget {
-  final Anime anime;
-
-  const RandomAnimeCard({super.key, required this.anime});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.black.withOpacity(0.3),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // Background Image with Blur
-            CachedOrNetworkImage(
-              id: anime.id.toString(),
-              imageUrl: anime.imageUrl,
-              width: double.infinity,
-              height: 250,
-              fit: BoxFit.cover,
-              color: Colors.black.withOpacity(0.5),
-              colorBlendMode: BlendMode.darken,
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text(
-                    anime.title,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xffdbe6ff),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  // Description
-                  Text(
-                    anime.synopsis ?? 'No synopsis available.',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-                  // Genre and Release Date
-                  Row(
-                    children: [
-                      if (anime.genre != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.tealAccent.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            anime.genre!,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              color: Colors.tealAccent,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      if (anime.releaseDate != null)
-                        Text(
-                          anime.releaseDate!,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

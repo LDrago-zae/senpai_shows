@@ -6,6 +6,7 @@ import 'package:senpai_shows/firebase/senpai_auth.dart';
 import 'package:senpai_shows/layout/main_navigation.dart';
 import 'package:senpai_shows/screens/senpai_home.dart';
 import 'package:senpai_shows/screens/senpai_signup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../components/slide_animation.dart';
 // Hypothetical home screen
 
@@ -22,6 +23,33 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
   bool _isMALLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRememberMe();
+  }
+
+  Future<void> _checkRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    final remembered = prefs.getBool('remember_me') ?? false;
+
+    if (remembered) {
+      // Auto-navigate to MainNavigation without login
+      Navigator.pushReplacement(
+        context,
+        SlideAnimation(
+          page: const MainNavigation(),
+          direction: AxisDirection.right,
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveRememberMe(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remember_me', value);
+  }
 
   final SenpaiAuth _auth = SenpaiAuth();
   bool _isLoading = false;
@@ -298,8 +326,9 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
-                                onPressed: (){_isLoading ? null : _performLogin;
-                                  },
+                                onPressed: () {
+                                  _isLoading ? null : _performLogin;
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF4ECDC4),
                                   shape: RoundedRectangleBorder(

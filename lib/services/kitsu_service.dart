@@ -56,4 +56,20 @@ class KitsuApiService {
       throw Exception('Failed to fetch anime from Kitsu');
     }
   }
+
+  Future<Anime?> fetchRandomAnime() async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/anime?page[limit]=1&page[offset]=${(DateTime.now().millisecondsSinceEpoch / 1000).floor() % 1000}'),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      if (data.isNotEmpty) {
+        return Anime.fromKitsuJson(data.first);
+      }
+      return null; // No anime found
+    } else {
+      throw Exception('Failed to fetch random anime from Kitsu');
+    }
+  }
 }

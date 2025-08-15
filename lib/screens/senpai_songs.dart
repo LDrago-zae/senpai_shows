@@ -69,7 +69,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color.fromARGB(38, 10, 10, 255),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -97,12 +97,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
       ),
       body: Stack(
         children: [
-          const LightBlackGlassmorphicContainer(
-            blurStrength: 8.0,
-            borderRadius: 16.0,
-            padding: EdgeInsets.all(16.0),
-            child: SizedBox.expand(),
-          ),
+          SizedBox.expand(),
           SafeArea(
             child: Column(
               children: [

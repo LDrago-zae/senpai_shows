@@ -31,10 +31,10 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color.fromARGB(38, 10, 10, 255),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color.fromARGB(38, 10, 10, 255),
         elevation: 0,
         title: Text(
           'Profile',
@@ -59,27 +59,25 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       ),
       body: Stack(
         children: [
-          const LightBlackGlassmorphicContainer(
-            blurStrength: 8.0,
-            borderRadius: 16.0,
-            padding: EdgeInsets.all(16.0),
-            child: SizedBox.expand(),
-          ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  _buildProfileHeader(),
-                  const SizedBox(height: 24),
-                  _buildStatsCards(),
-                  const SizedBox(height: 24),
-                  _buildSettingsSection(),
-                  const SizedBox(height: 24),
-                  _buildActionButtons(),
-                ],
-              ),
+          SizedBox.expand(),
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 16.0,
+              bottom: 100.0, // Add bottom padding for navigation bar
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 100),
+                _buildProfileHeader(),
+                const SizedBox(height: 24),
+                _buildStatsCards(),
+                const SizedBox(height: 24),
+                _buildSettingsSection(),
+                const SizedBox(height: 24),
+                _buildActionButtons(),
+              ],
             ),
           ),
         ],

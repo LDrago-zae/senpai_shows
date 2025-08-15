@@ -144,7 +144,7 @@ class _SearchScreenState extends State<SenpaiSearch>
   Widget build(BuildContext context) {
     super.build(context);
     return Container(
-      color: Colors.grey[900],
+      color: Color.fromARGB(38, 10, 10, 255),
       child: SafeArea(
         top: true,
         bottom: false,

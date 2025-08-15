@@ -686,7 +686,7 @@ class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProv
                 id: widget.anime.id.toString(),
                 imageUrl: widget.anime.imageUrl,
                 width: double.infinity,
-                height: 250,
+                height: 300,
                 fit: BoxFit.cover,
                 color: Colors.black.withOpacity(0.5),
                 colorBlendMode: BlendMode.darken,
@@ -703,6 +703,7 @@ class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 100),
                     // Title
                     Text(
                       widget.anime.title,

@@ -78,7 +78,8 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color.fromARGB(38, 10, 10, 255),
+      extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -106,12 +107,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
       ),
       body: Stack(
         children: [
-          const LightBlackGlassmorphicContainer(
-            blurStrength: 6.0,
-            borderRadius: 16.0,
-            padding: EdgeInsets.all(16.0),
-            child: SizedBox.expand(),
-          ),
+          SizedBox.expand(),
           SafeArea(
             child: Column(
               children: [

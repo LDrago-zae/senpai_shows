@@ -9,6 +9,7 @@ import 'package:senpai_shows/controllers/home_controller.dart';
 import 'package:senpai_shows/models/anime_model.dart';
 import 'package:senpai_shows/database/image_cache_helper.dart';
 import 'package:senpai_shows/screens/senpai_details_screen.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:typed_data';
 import '../components/trending_cards.dart';

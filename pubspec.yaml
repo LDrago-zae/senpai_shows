@@ -54,6 +54,7 @@ dependencies:
   jikan_api: ^2.2.1
   shared_preferences: any
   visibility_detector: ^0.4.0+2
+  skeletonizer: ^2.1.0+1
 
 
 dev_dependencies:

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
-import 'package:senpai_shows/firebase/senpai_auth.dart';
-import 'package:senpai_shows/screens/senpai_login.dart';
-import 'package:senpai_shows/screens/senpai_splash.dart';
-import 'package:senpai_shows/components/slide_animation.dart';
+import '../services/user_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SenpaiProfile extends StatefulWidget {
   const SenpaiProfile({super.key});
@@ -14,36 +11,56 @@ class SenpaiProfile extends StatefulWidget {
 }
 
 class _SenpaiProfileState extends State<SenpaiProfile> {
+  final UserService _userService = UserService();
+  User? _currentUser;
   bool _loading = false;
 
-  // Sample user data - replace with actual user data
-  final UserProfile _userProfile = UserProfile(
-    name: 'Otaku Senpai',
-    email: 'otaku@senpai.com',
-    avatarUrl: '',
-    joinDate: DateTime(2023, 1, 15),
-    favoriteGenres: ['Action', 'Romance', 'Slice of Life'],
-    watchedAnime: 127,
-    favoriteAnime: 23,
-    watchTime: 2847, // in hours
-  );
+  // Sample user data for additional stats (replace with actual data from your backend)
+  final Map<String, dynamic> _userProfile = {
+    'favoriteGenres': ['Action', 'Romance', 'Slice of Life'],
+    'watchedAnime': 127,
+    'favoriteAnime': 23,
+    'watchTime': 2847, // in hours
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+
+    // Listen to auth state changes
+    _userService.authStateChanges.listen((User? user) {
+      if (mounted) {
+        setState(() {
+          _currentUser = user;
+        });
+      }
+    });
+  }
+
+  void _loadUserData() {
+    setState(() {
+      _currentUser = _userService.currentUser;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(38, 10, 10, 255),
+      backgroundColor: const Color.fromARGB(38, 10, 10, 255),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(38, 10, 10, 255),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           'Profile',
           style: GoogleFonts.urbanist(
+            color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -51,35 +68,39 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
-            onPressed: () {
-              _showEditProfile();
-            },
+            onPressed: _showEditProfile,
           ),
         ],
       ),
       body: Stack(
         children: [
           SizedBox.expand(),
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-              top: 16.0,
-              bottom: 100.0, // Add bottom padding for navigation bar
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 100),
-                _buildProfileHeader(),
-                const SizedBox(height: 24),
-                _buildStatsCards(),
-                const SizedBox(height: 24),
-                _buildSettingsSection(),
-                const SizedBox(height: 24),
-                _buildActionButtons(),
-              ],
-            ),
-          ),
+          _currentUser != null
+              ? _buildProfileContent()
+              : _buildLoginPrompt(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(
+        left: 16.0,
+        right: 16.0,
+        top: 16.0,
+        bottom: 100.0,
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 100),
+          _buildProfileHeader(),
+          const SizedBox(height: 24),
+          _buildStatsCards(),
+          const SizedBox(height: 24),
+          _buildSettingsSection(),
+          const SizedBox(height: 24),
+          _buildActionButtons(),
         ],
       ),
     );
@@ -96,19 +117,37 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
+        border: Border.all(color: Colors.tealAccent.withOpacity(0.3)),
       ),
       child: Column(
         children: [
           Stack(
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blueAccent.withOpacity(0.3),
-                child: const Icon(
-                  Icons.person,
-                  size: 60,
-                  color: Colors.blueAccent,
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.tealAccent,
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: _currentUser!.photoURL != null
+                      ? Image.network(
+                    _currentUser!.photoURL!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => _defaultAvatar(),
+                  )
+                      : _defaultAvatar(),
                 ),
               ),
               Positioned(
@@ -117,7 +156,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.blueAccent,
+                    color: Colors.tealAccent,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white, width: 2),
                   ),
@@ -132,7 +171,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           ),
           const SizedBox(height: 16),
           Text(
-            _userProfile.name,
+            _currentUser!.displayName ?? 'Anonymous User',
             style: GoogleFonts.urbanist(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -141,7 +180,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           ),
           const SizedBox(height: 4),
           Text(
-            _userProfile.email,
+            _currentUser!.email ?? 'No email',
             style: GoogleFonts.urbanist(
               fontSize: 16,
               color: Colors.white70,
@@ -149,10 +188,10 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Member since ${_userProfile.joinDate.year}',
+            'Member since ${_formatJoinDate(_currentUser!.metadata.creationTime)}',
             style: GoogleFonts.urbanist(
               fontSize: 14,
-              color: Colors.blueAccent,
+              color: Colors.tealAccent,
             ),
           ),
         ],
@@ -166,7 +205,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
         Expanded(
           child: _buildStatCard(
             'Watched',
-            '${_userProfile.watchedAnime}',
+            '${_userProfile['watchedAnime']}',
             'Anime',
             Icons.play_circle_filled,
             Colors.green,
@@ -176,7 +215,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
         Expanded(
           child: _buildStatCard(
             'Favorites',
-            '${_userProfile.favoriteAnime}',
+            '${_userProfile['favoriteAnime']}',
             'Shows',
             Icons.favorite,
             Colors.red,
@@ -186,7 +225,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
         Expanded(
           child: _buildStatCard(
             'Watch Time',
-            '${_userProfile.watchTime}',
+            '${_userProfile['watchTime']}',
             'Hours',
             Icons.access_time,
             Colors.orange,
@@ -246,7 +285,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           _buildSettingsTile(
             'Account Settings',
             Icons.settings,
-            Colors.blueAccent,
+            Colors.tealAccent,
                 () => _showComingSoon('Account Settings'),
           ),
           const Divider(color: Colors.white12),
@@ -274,7 +313,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           _buildSettingsTile(
             'Help & Support',
             Icons.help,
-            Colors.tealAccent,
+            Colors.blueAccent,
                 () => _showComingSoon('Help Center'),
           ),
         ],
@@ -305,7 +344,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           child: ElevatedButton.icon(
             onPressed: () => _showComingSoon('Theme Settings'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Colors.tealAccent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -313,14 +352,20 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
               ),
             ),
             icon: const Icon(Icons.palette),
-            label: const Text('Customize Theme'),
+            label: Text(
+              'Customize Theme',
+              style: GoogleFonts.urbanist(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () => _showSignOutConfirmation(),
+            onPressed: _showSignOutConfirmation,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
@@ -330,11 +375,124 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
               ),
             ),
             icon: const Icon(Icons.logout),
-            label: const Text('Sign Out'),
+            label: Text(
+              'Sign Out',
+              style: GoogleFonts.urbanist(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildLoginPrompt() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.person_outline,
+            size: 100,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Please Sign In',
+            style: GoogleFonts.urbanist(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Sign in to view your profile',
+            style: GoogleFonts.urbanist(
+              color: Colors.grey[400],
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 30),
+          ElevatedButton.icon(
+            onPressed: _signInWithGoogle,
+            icon: const Icon(Icons.login, color: Colors.white),
+            label: Text(
+              'Sign in with Google',
+              style: GoogleFonts.urbanist(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.tealAccent,
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _defaultAvatar() {
+    return Container(
+      color: Colors.grey[800],
+      child: Icon(
+        Icons.person,
+        size: 60,
+        color: Colors.grey[400],
+      ),
+    );
+  }
+
+  String _formatJoinDate(DateTime? date) {
+    if (date == null) return 'Unknown';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatLastSignIn(DateTime? date) {
+    if (date == null) return 'Unknown';
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hours ago';
+    } else {
+      return '${difference.inMinutes} minutes ago';
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _loading = true);
+    try {
+      final result = await _userService.signInWithGoogle();
+      if (result != null) {
+        setState(() {
+          _currentUser = result.user;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Signed in successfully'),
+            backgroundColor: const Color(0xFF4ECDC4),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign in failed: $e')),
+      );
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   void _showEditProfile() {
@@ -368,7 +526,13 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
+              child: Text(
+                'Close',
+                style: GoogleFonts.urbanist(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -380,7 +544,8 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$feature coming soon!'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.tealAccent,
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -401,72 +566,46 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.urbanist(color: Colors.white),
+            ),
           ),
           TextButton(
             onPressed: () async {
               setState(() => _loading = true);
               try {
-                await SenpaiAuth().signOut();
-                if (mounted) {
-                  Navigator.pop(context); // Close dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Signed out successfully'),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      backgroundColor: const Color(0xFF4ECDC4),
-                      duration: const Duration(seconds: 1),
-                    ),
-                  );
-                  Navigator.pushReplacement(
-                    context,
-                    SlideAnimation(
-                      page: const SenpaiLogin(),
-                      direction: AxisDirection.left,
-                    ),
-                  );
-                }
+                await _userService.signOut();
+                setState(() {
+                  _currentUser = null;
+                });
+                Navigator.pop(context); // Close dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Signed out successfully'),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: const Color(0xFF4ECDC4),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Sign-out failed: $e'),
-                      backgroundColor: Colors.redAccent,
-                    ),
-                  );
-                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Sign-out failed: $e'),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
               } finally {
-                if (mounted) {
-                  setState(() => _loading = false);
-                }
+                setState(() => _loading = false);
               }
             },
-            child: const Text('Sign Out', style: TextStyle(color: Colors.redAccent)),
+            child: Text(
+              'Sign Out',
+              style: GoogleFonts.urbanist(color: Colors.redAccent),
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-class UserProfile {
-  final String name;
-  final String email;
-  final String avatarUrl;
-  final DateTime joinDate;
-  final List<String> favoriteGenres;
-  final int watchedAnime;
-  final int favoriteAnime;
-  final int watchTime;
-
-  UserProfile({
-    required this.name,
-    required this.email,
-    required this.avatarUrl,
-    required this.joinDate,
-    required this.favoriteGenres,
-    required this.watchedAnime,
-    required this.favoriteAnime,
-    required this.watchTime,
-  });
 }

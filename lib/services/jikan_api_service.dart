@@ -1,4 +1,4 @@
-// import 'package:jikan_api/jikan_api.dart';
+// import 'package:jikan_api/jikan_api.dart' hide Anime;
 // import '../models/anime_model.dart';
 //
 // class JikanApiService {
@@ -14,7 +14,7 @@
 //       final topList = await _jikan.getTop(type, subtype: subtype);
 //       return topList.take(limit).map((top) => Anime(
 //         title: top.title ?? 'No Title',
-//         imageUrl: top.imageUrl ?? '',
+//         imageUrl: top.imageUrl ?? '', id: top.malId,
 //       )).toList();
 //     } catch (e) {
 //       throw Exception('Failed to load top anime: $e');

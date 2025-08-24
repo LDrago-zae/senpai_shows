@@ -100,7 +100,7 @@ class Anime {
 
     return Anime(
       id: json['id'],
-      title: json['name'] ?? json['russian'] ?? 'Unknown', // Use Russian title if name is missing?
+      title: json['name'] ?? json['japanese'] ?? 'Unknown', // Use Russian title if name is missing?
       imageUrl: 'https://shikimori.one${json['image']?['original'] ?? ''}',
       genre: (json['genres'] as List?)?.map((g) => g['russian'] as String?).join(', '), // Example for Russian genre names
       releaseDate: json['aired_on'] ?? json['released_on'] ?? 'Unknown',

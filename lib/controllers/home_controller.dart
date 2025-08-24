@@ -68,6 +68,63 @@ class HomeController {
     return await _randomAnimeController.fetchRandomAnime();
   }
 
+  Future<List<Anime>> fetchAnimeByGenre(String genre, {String source = 'anilist', int perPage = 20}) async {
+    switch (source.toLowerCase()) {
+      case 'anilist':
+        return await _aniListService.fetchAnimeByGenre(genre, perPage: perPage);
+      case 'shikimori':
+        return await _shikimoriService.fetchAnimeByGenre(genre, limit: perPage);
+      case 'kitsu':
+        return await _kitsuService.fetchAnimeByGenre(genre, limit: perPage);
+      default:
+        return await _aniListService.fetchAnimeByGenre(genre, perPage: perPage);
+    }
+  }
+
+// Fetch from multiple sources and combine
+  Future<List<Anime>> fetchAnimeByGenreMultiSource(String genre, {int perPage = 15}) async {
+    try {
+      final results = await Future.wait([
+        _aniListService.fetchAnimeByGenre(genre, perPage: perPage ~/ 2),
+        _shikimoriService.fetchAnimeByGenre(genre, limit: perPage ~/ 2),
+      ]);
+
+      final combinedList = <Anime>[];
+      for (final list in results) {
+        combinedList.addAll(list);
+      }
+
+      // Remove duplicates based on title
+      final uniqueAnime = <String, Anime>{};
+      for (final anime in combinedList) {
+        uniqueAnime[anime.title] = anime;
+      }
+
+      return uniqueAnime.values.toList();
+    } catch (e) {
+      print('Error fetching from multiple sources: $e');
+      // Fallback to single source
+      return await _aniListService.fetchAnimeByGenre(genre, perPage: perPage);
+    }
+  }
+
+  Future<List<Anime>> searchAnime(String query, {String source = 'anilist'}) async {
+    if (query.trim().isEmpty) {
+      return [];
+    }
+
+    switch (source.toLowerCase()) {
+      case 'anilist':
+        return await _aniListService.searchAnime(query);
+      case 'shikimori':
+        return await _shikimoriService.searchAnime(query);
+      case 'kitsu':
+        return await _kitsuService.searchAnime(query);
+      default:
+        return await _aniListService.searchAnime(query);
+    }
+  }
+
   void dispose() {
     // No resources to dispose since no state management or listeners
   }

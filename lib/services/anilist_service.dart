@@ -180,6 +180,196 @@ class AniListApiService {
       throw Exception('Failed to fetch random anime');
     }
   }
+
+  Future<List<Anime>> fetchAnimeByGenre(String genre, {int page = 1, int perPage = 20}) async {
+    const String query = '''
+    query (\$page: Int, \$perPage: Int, \$genre: String) {
+      Page(page: \$page, perPage: \$perPage) {
+        media(genre: \$genre, type: ANIME, sort: POPULARITY_DESC) {
+          id
+          title {
+            romaji
+            english
+            native
+          }
+          coverImage {
+            large
+            medium
+          }
+          averageScore
+          episodes
+          status
+          description
+          startDate {
+            year
+          }
+          genres
+          studios {
+            nodes {
+              name
+            }
+          }
+          format
+        }
+      }
+    }
+  ''';
+
+    final variables = {
+      'page': page,
+      'perPage': perPage,
+      'genre': genre,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'query': query,
+          'variables': variables,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['errors'] != null) {
+          throw Exception('GraphQL Error: ${data['errors']}');
+        }
+
+        final List<dynamic> mediaList = data['data']['Page']['media'];
+        return mediaList.map((item) {
+          return Anime(
+            id: item['id'],
+            title: item['title']['english'] ??
+                item['title']['romaji'] ??
+                item['title']['native'] ??
+                'Unknown Title',
+            imageUrl: item['coverImage']['large'] ??
+                item['coverImage']['medium'] ??
+                'https://via.placeholder.com/300x400',
+            rating: (item['averageScore'] ?? 0).toDouble() / 10.0,
+            episodes: item['episodes'],
+            status: _mapAniListStatus(item['status']),
+            synopsis: item['description']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? 'No synopsis available.',
+            releaseDate: item['startDate']?['year']?.toString(),
+            genre: item['genres']?.join(', '),
+            rank: 0,
+            starring: item['studios']?['nodes']?.isNotEmpty == true
+                ? item['studios']['nodes'][0]['name']
+                : 'Unknown Studio',
+          );
+        }).toList();
+      } else {
+        throw Exception('Failed to fetch $genre anime from AniList: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching $genre anime from AniList: $e');
+      throw Exception('Failed to load $genre anime from AniList');
+    }
+  }
+
+  String _mapAniListStatus(String? status) {
+    switch (status) {
+      case 'RELEASING':
+        return 'Airing';
+      case 'FINISHED':
+        return 'Finished';
+      case 'NOT_YET_RELEASED':
+        return 'Not Yet Aired';
+      case 'CANCELLED':
+        return 'Cancelled';
+      case 'HIATUS':
+        return 'Hiatus';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Future<List<Anime>> searchAnime(String query, {int page = 1, int perPage = 10}) async {
+    const String searchQuery = '''
+    query (\$page: Int, \$perPage: Int, \$search: String) {
+      Page(page: \$page, perPage: \$perPage) {
+        media(search: \$search, type: ANIME, sort: POPULARITY_DESC) {
+          id
+          title {
+            romaji
+            english
+            native
+          }
+          coverImage {
+            large
+            medium
+          }
+          averageScore
+          episodes
+          status
+          description
+          startDate {
+            year
+          }
+          genres
+        }
+      }
+    }
+  ''';
+
+    final variables = {
+      'page': page,
+      'perPage': perPage,
+      'search': query,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'query': searchQuery,
+          'variables': variables,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['errors'] != null) {
+          throw Exception('GraphQL Error: ${data['errors']}');
+        }
+
+        final List<dynamic> mediaList = data['data']['Page']['media'];
+        return mediaList.map((item) {
+          return Anime(
+            id: item['id'],
+            title: item['title']['english'] ??
+                item['title']['romaji'] ??
+                item['title']['native'] ??
+                'Unknown Title',
+            imageUrl: item['coverImage']['large'] ??
+                item['coverImage']['medium'] ??
+                'https://via.placeholder.com/300x400',
+            rating: (item['averageScore'] ?? 0).toDouble() / 10.0,
+            episodes: item['episodes'],
+            status: _mapAniListStatus(item['status']),
+            synopsis: item['description']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? 'No synopsis available.',
+            releaseDate: item['startDate']?['year']?.toString(),
+            genre: item['genres']?.join(', '),
+            rank: 0,
+          );
+        }).toList();
+      } else {
+        throw Exception('Failed to search anime: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error searching anime: $e');
+      return [];
+    }
+  }
 }
 
 

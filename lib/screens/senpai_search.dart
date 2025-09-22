@@ -101,8 +101,8 @@ class _SearchScreenState extends State<SenpaiSearch>
         CurvedAnimation(
           parent: _animationController,
           curve: Interval(
-            index * 0.08,
-            (index * 0.08) + 0.28,
+            (index * 0.08).clamp(0.0, 0.8),
+            ((index * 0.08) + 0.28).clamp(0.2, 1.0),
             curve: Curves.easeOut,
           ),
         ),
@@ -115,13 +115,14 @@ class _SearchScreenState extends State<SenpaiSearch>
         CurvedAnimation(
           parent: _animationController,
           curve: Interval(
-            index * 0.08,
-            (index * 0.08) + 0.28,
+            (index * 0.08).clamp(0.0, 0.8),
+            ((index * 0.08) + 0.28).clamp(0.2, 1.0),
             curve: Curves.easeOut,
           ),
         ),
       ),
     );
+
 
     _tabListener = () {
       if (widget.tabNotifier.value == 1) {

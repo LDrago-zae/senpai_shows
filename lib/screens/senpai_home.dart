@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/components/featured_banner.dart';
 import 'package:senpai_shows/components/bento_grid.dart';
-import 'package:senpai_shows/components/senpai_anime_card.dart';
 import 'package:senpai_shows/controllers/home_controller.dart';
 import 'package:senpai_shows/models/anime_model.dart';
 import 'package:senpai_shows/database/image_cache_helper.dart';
 import 'package:senpai_shows/screens/senpai_details_screen.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:typed_data';
 import '../components/trending_cards.dart';
@@ -22,7 +19,8 @@ class SenpaiHome extends StatefulWidget {
   State<SenpaiHome> createState() => _SenpaiHomeState();
 }
 
-class _SenpaiHomeState extends State<SenpaiHome> with SingleTickerProviderStateMixin {
+class _SenpaiHomeState extends State<SenpaiHome>
+    with SingleTickerProviderStateMixin {
   final HomeController _homeController = HomeController();
   final ScrollController _scrollController = ScrollController();
 
@@ -160,10 +158,10 @@ class _SenpaiHomeState extends State<SenpaiHome> with SingleTickerProviderStateM
                       ),
                     )
                   else if (_randomAnime != null)
-                      RandomAnimeCard(
-                        anime: _randomAnime!,
-                        index: 0, // Single card
-                      ),
+                    RandomAnimeCard(
+                      anime: _randomAnime!,
+                      index: 0, // Single card
+                    ),
 
                   // Trending Header
                   Padding(
@@ -282,10 +280,7 @@ class _SenpaiHomeState extends State<SenpaiHome> with SingleTickerProviderStateM
                           itemCount: animeList.length,
                           itemBuilder: (context, index) {
                             final Anime anime = animeList[index];
-                            return SenpaiAnimeCard(
-                              index: index,
-                              anime: anime,
-                            );
+                            return SenpaiAnimeCard(index: index, anime: anime);
                           },
                         ),
                       );
@@ -306,17 +301,14 @@ class SenpaiAnimeCard extends StatefulWidget {
   final Anime anime;
   final int index;
 
-  const SenpaiAnimeCard({
-    super.key,
-    required this.anime,
-    required this.index,
-  });
+  const SenpaiAnimeCard({super.key, required this.anime, required this.index});
 
   @override
   State<SenpaiAnimeCard> createState() => _SenpaiAnimeCardState();
 }
 
-class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProviderStateMixin {
+class _SenpaiAnimeCardState extends State<SenpaiAnimeCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
   late Animation<double> _slideAnimation;
@@ -363,7 +355,9 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProv
     return VisibilityDetector(
       key: Key('anime_card_${widget.anime.id}'),
       onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.5 && !_animationController.isAnimating && !_animationController.isCompleted) {
+        if (info.visibleFraction > 0.5 &&
+            !_animationController.isAnimating &&
+            !_animationController.isCompleted) {
           _animationController.forward();
         }
       },
@@ -389,16 +383,17 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProv
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SenpaiDetailsScreen(
-              anime: AnimeModel(
-                title: widget.anime.title,
-                genre: widget.anime.genre ?? 'Unknown',
-                imagePath: widget.anime.imageUrl,
-                synopsis: widget.anime.synopsis ?? 'No synopsis available.',
-                releaseDate: widget.anime.releaseDate ?? 'Unknown',
-                starring: widget.anime.starring ?? 'N/A',
-              ),
-            ),
+            builder:
+                (context) => SenpaiDetailsScreen(
+                  anime: AnimeModel(
+                    title: widget.anime.title,
+                    genre: widget.anime.genre ?? 'Unknown',
+                    imagePath: widget.anime.imageUrl,
+                    synopsis: widget.anime.synopsis ?? 'No synopsis available.',
+                    releaseDate: widget.anime.releaseDate ?? 'Unknown',
+                    starring: widget.anime.starring ?? 'N/A',
+                  ),
+                ),
           ),
         );
       },
@@ -427,12 +422,17 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProv
                   width: 150,
                   height: 200,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    width: 150,
-                    height: 200,
-                    color: Colors.grey[800],
-                    child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
-                  ),
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        width: 150,
+                        height: 200,
+                        color: Colors.grey[800],
+                        child: const Icon(
+                          Icons.broken_image,
+                          color: Colors.grey,
+                          size: 50,
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -446,16 +446,20 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProv
                     // Status Badge
                     if (widget.anime.status != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: widget.anime.status == 'Airing'
-                                ? Colors.green
-                                : widget.anime.status == 'Finished'
-                                ? Colors.blue
-                                : Colors.red,
+                            color:
+                                widget.anime.status == 'Airing'
+                                    ? Colors.green
+                                    : widget.anime.status == 'Finished'
+                                    ? Colors.blue
+                                    : Colors.red,
                           ),
                         ),
                         child: Text(
@@ -533,25 +537,33 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> with SingleTickerProv
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: (widget.anime.genre != null
-                          ? widget.anime.genre!.split(',').map((g) => g.trim()).toList()
-                          : [])
-                          .map((genre) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.tealAccent.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            genre,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12,
-                              color: Colors.tealAccent,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          (widget.anime.genre != null
+                                  ? widget.anime.genre!
+                                      .split(',')
+                                      .map((g) => g.trim())
+                                      .toList()
+                                  : [])
+                              .map((genre) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.tealAccent.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    genre,
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 12,
+                                      color: Colors.tealAccent,
+                                    ),
+                                  ),
+                                );
+                              })
+                              .toList(),
                     ),
                   ],
                 ),
@@ -569,17 +581,14 @@ class RandomAnimeCard extends StatefulWidget {
   final Anime anime;
   final int index;
 
-  const RandomAnimeCard({
-    super.key,
-    required this.anime,
-    required this.index,
-  });
+  const RandomAnimeCard({super.key, required this.anime, required this.index});
 
   @override
   State<RandomAnimeCard> createState() => _RandomAnimeCardState();
 }
 
-class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProviderStateMixin {
+class _RandomAnimeCardState extends State<RandomAnimeCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
   late Animation<double> _slideAnimation;
@@ -626,7 +635,9 @@ class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProv
     return VisibilityDetector(
       key: Key('random_anime_card_${widget.anime.id}'),
       onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.5 && !_animationController.isAnimating && !_animationController.isCompleted) {
+        if (info.visibleFraction > 0.5 &&
+            !_animationController.isAnimating &&
+            !_animationController.isCompleted) {
           _animationController.forward();
         }
       },
@@ -652,16 +663,17 @@ class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProv
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SenpaiDetailsScreen(
-              anime: AnimeModel(
-                title: widget.anime.title,
-                genre: widget.anime.genre ?? 'Unknown',
-                imagePath: widget.anime.imageUrl,
-                synopsis: widget.anime.synopsis ?? 'No synopsis available.',
-                releaseDate: widget.anime.releaseDate ?? 'Unknown',
-                starring: widget.anime.starring ?? 'N/A',
-              ),
-            ),
+            builder:
+                (context) => SenpaiDetailsScreen(
+                  anime: AnimeModel(
+                    title: widget.anime.title,
+                    genre: widget.anime.genre ?? 'Unknown',
+                    imagePath: widget.anime.imageUrl,
+                    synopsis: widget.anime.synopsis ?? 'No synopsis available.',
+                    releaseDate: widget.anime.releaseDate ?? 'Unknown',
+                    starring: widget.anime.starring ?? 'N/A',
+                  ),
+                ),
           ),
         );
       },
@@ -691,12 +703,17 @@ class _RandomAnimeCardState extends State<RandomAnimeCard> with SingleTickerProv
                 fit: BoxFit.cover,
                 color: Colors.black.withOpacity(0.5),
                 colorBlendMode: BlendMode.darken,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: double.infinity,
-                  height: 250,
-                  color: Colors.grey[800],
-                  child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
-                ),
+                errorBuilder:
+                    (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 250,
+                      color: Colors.grey[800],
+                      child: const Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                        size: 50,
+                      ),
+                    ),
               ),
               // Content
               Padding(
@@ -821,8 +838,9 @@ Widget CachedOrNetworkImage({
               child: const Center(child: CircularProgressIndicator()),
             );
           },
-          errorBuilder: errorBuilder ??
-                  (context, error, stackTrace) => Container(
+          errorBuilder:
+              errorBuilder ??
+              (context, error, stackTrace) => Container(
                 width: width,
                 height: height,
                 color: Colors.grey,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
 
 class SenpaiSongs extends StatefulWidget {
   const SenpaiSongs({super.key});
@@ -14,7 +13,13 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
   bool _loading = true;
   String? _error;
   String _selectedCategory = 'All';
-  final List<String> _categories = ['All', 'Popular', 'Recent', 'Classics', 'Favorites'];
+  final List<String> _categories = [
+    'All',
+    'Popular',
+    'Recent',
+    'Classics',
+    'Favorites',
+  ];
 
   @override
   void initState() {
@@ -63,7 +68,9 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
 
   List<AnimeOpening> get _filteredOpenings {
     if (_selectedCategory == 'All') return _openings;
-    return _openings.where((opening) => opening.category == _selectedCategory).toList();
+    return _openings
+        .where((opening) => opening.category == _selectedCategory)
+        .toList();
   }
 
   @override
@@ -114,7 +121,9 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.purpleAccent.withOpacity(0.3)),
+                    border: Border.all(
+                      color: Colors.purpleAccent.withOpacity(0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -168,16 +177,21 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
                         },
                         child: Container(
                           margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.purpleAccent
-                                : Colors.white.withOpacity(0.1),
+                            color:
+                                isSelected
+                                    ? Colors.purpleAccent
+                                    : Colors.white.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: isSelected
-                                  ? Colors.purpleAccent
-                                  : Colors.white.withOpacity(0.3),
+                              color:
+                                  isSelected
+                                      ? Colors.purpleAccent
+                                      : Colors.white.withOpacity(0.3),
                             ),
                           ),
                           child: Text(
@@ -194,9 +208,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
                 ),
                 const SizedBox(height: 16),
                 // Content Section
-                Expanded(
-                  child: _buildContent(),
-                ),
+                Expanded(child: _buildContent()),
               ],
             ),
           ),
@@ -208,9 +220,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
   Widget _buildContent() {
     if (_loading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: Colors.purpleAccent,
-        ),
+        child: CircularProgressIndicator(color: Colors.purpleAccent),
       );
     }
 
@@ -219,11 +229,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.redAccent,
-              size: 60,
-            ),
+            Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
             const SizedBox(height: 16),
             Text(
               _error!,
@@ -251,11 +257,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.music_off,
-              color: Colors.white54,
-              size: 80,
-            ),
+            Icon(Icons.music_off, color: Colors.white54, size: 80),
             const SizedBox(height: 24),
             Text(
               'No Openings Found',
@@ -269,10 +271,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
             Text(
               'No anime openings found for this category.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+              style: GoogleFonts.urbanist(fontSize: 16, color: Colors.white70),
             ),
           ],
         ),
@@ -292,9 +291,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
   Widget _buildOpeningCard(AnimeOpening opening) {
     return Card(
       color: Colors.black.withOpacity(0.7),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
@@ -333,10 +330,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
             const SizedBox(height: 2),
             Text(
               opening.animeName,
-              style: GoogleFonts.urbanist(
-                fontSize: 12,
-                color: Colors.white70,
-              ),
+              style: GoogleFonts.urbanist(fontSize: 12, color: Colors.white70),
             ),
           ],
         ),
@@ -345,10 +339,7 @@ class _SenpaiSongsState extends State<SenpaiSongs> {
           children: [
             Text(
               opening.duration,
-              style: GoogleFonts.urbanist(
-                fontSize: 12,
-                color: Colors.white54,
-              ),
+              style: GoogleFonts.urbanist(fontSize: 12, color: Colors.white54),
             ),
             const SizedBox(width: 8),
             IconButton(

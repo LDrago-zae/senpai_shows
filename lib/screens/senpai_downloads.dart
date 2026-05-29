@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
 
 class SenpaiDownloads extends StatefulWidget {
   const SenpaiDownloads({super.key});
@@ -65,14 +64,20 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
 
   List<DownloadedAnime> get _filteredDownloads {
     if (_selectedFilter == 'All') return _downloads;
-    return _downloads.where((download) =>
-      download.status.toString().split('.').last.toLowerCase() ==
-      _selectedFilter.toLowerCase()).toList();
+    return _downloads
+        .where(
+          (download) =>
+              download.status.toString().split('.').last.toLowerCase() ==
+              _selectedFilter.toLowerCase(),
+        )
+        .toList();
   }
 
   double get _totalSize {
-    return _downloads.fold(0.0, (sum, download) =>
-      sum + double.parse(download.fileSize.split(' ')[0]));
+    return _downloads.fold(
+      0.0,
+      (sum, download) => sum + double.parse(download.fileSize.split(' ')[0]),
+    );
   }
 
   @override
@@ -124,7 +129,9 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.orangeAccent.withOpacity(0.3)),
+                    border: Border.all(
+                      color: Colors.orangeAccent.withOpacity(0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -178,16 +185,21 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
                         },
                         child: Container(
                           margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.orangeAccent
-                                : Colors.white.withOpacity(0.1),
+                            color:
+                                isSelected
+                                    ? Colors.orangeAccent
+                                    : Colors.white.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: isSelected
-                                  ? Colors.orangeAccent
-                                  : Colors.white.withOpacity(0.3),
+                              color:
+                                  isSelected
+                                      ? Colors.orangeAccent
+                                      : Colors.white.withOpacity(0.3),
                             ),
                           ),
                           child: Text(
@@ -204,9 +216,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
                 ),
                 const SizedBox(height: 16),
                 // Content Section
-                Expanded(
-                  child: _buildContent(),
-                ),
+                Expanded(child: _buildContent()),
               ],
             ),
           ),
@@ -218,9 +228,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
   Widget _buildContent() {
     if (_loading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: Colors.orangeAccent,
-        ),
+        child: CircularProgressIndicator(color: Colors.orangeAccent),
       );
     }
 
@@ -229,11 +237,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.redAccent,
-              size: 60,
-            ),
+            Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
             const SizedBox(height: 16),
             Text(
               _error!,
@@ -261,11 +265,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.download_outlined,
-              color: Colors.white54,
-              size: 80,
-            ),
+            Icon(Icons.download_outlined, color: Colors.white54, size: 80),
             const SizedBox(height: 24),
             Text(
               'No Downloads',
@@ -279,10 +279,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
             Text(
               'Download anime episodes to watch offline.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+              style: GoogleFonts.urbanist(fontSize: 16, color: Colors.white70),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
@@ -292,7 +289,10 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orangeAccent,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -318,9 +318,7 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
   Widget _buildDownloadCard(DownloadedAnime download) {
     return Card(
       color: Colors.black.withOpacity(0.7),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -365,7 +363,9 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
                     LinearProgressIndicator(
                       value: download.progress,
                       backgroundColor: Colors.grey.shade700,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.orangeAccent),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.orangeAccent,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -400,51 +400,52 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onSelected: (value) => _handleMenuAction(value, download),
-              itemBuilder: (context) => [
-                if (download.status == DownloadStatus.completed)
-                  const PopupMenuItem(
-                    value: 'play',
-                    child: Row(
-                      children: [
-                        Icon(Icons.play_arrow, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text('Play'),
-                      ],
+              itemBuilder:
+                  (context) => [
+                    if (download.status == DownloadStatus.completed)
+                      const PopupMenuItem(
+                        value: 'play',
+                        child: Row(
+                          children: [
+                            Icon(Icons.play_arrow, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Play'),
+                          ],
+                        ),
+                      ),
+                    if (download.status == DownloadStatus.downloading)
+                      const PopupMenuItem(
+                        value: 'pause',
+                        child: Row(
+                          children: [
+                            Icon(Icons.pause, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Pause'),
+                          ],
+                        ),
+                      ),
+                    if (download.status == DownloadStatus.paused)
+                      const PopupMenuItem(
+                        value: 'resume',
+                        child: Row(
+                          children: [
+                            Icon(Icons.play_arrow, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Resume'),
+                          ],
+                        ),
+                      ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.redAccent),
+                          SizedBox(width: 8),
+                          Text('Delete'),
+                        ],
+                      ),
                     ),
-                  ),
-                if (download.status == DownloadStatus.downloading)
-                  const PopupMenuItem(
-                    value: 'pause',
-                    child: Row(
-                      children: [
-                        Icon(Icons.pause, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text('Pause'),
-                      ],
-                    ),
-                  ),
-                if (download.status == DownloadStatus.paused)
-                  const PopupMenuItem(
-                    value: 'resume',
-                    child: Row(
-                      children: [
-                        Icon(Icons.play_arrow, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text('Resume'),
-                      ],
-                    ),
-                  ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: Colors.redAccent),
-                      SizedBox(width: 8),
-                      Text('Delete'),
-                    ],
-                  ),
-                ),
-              ],
+                  ],
             ),
           ],
         ),
@@ -495,9 +496,9 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
     switch (action) {
       case 'play':
         // TODO: Implement play functionality
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Playing ${download.title}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Playing ${download.title}')));
         break;
       case 'pause':
         setState(() {
@@ -518,32 +519,36 @@ class _SenpaiDownloadsState extends State<SenpaiDownloads> {
   void _showDeleteConfirmation(DownloadedAnime download) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey.shade900,
-        title: Text(
-          'Delete Download',
-          style: GoogleFonts.urbanist(color: Colors.white),
-        ),
-        content: Text(
-          'Are you sure you want to delete "${download.title}"?',
-          style: GoogleFonts.urbanist(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.grey.shade900,
+            title: Text(
+              'Delete Download',
+              style: GoogleFonts.urbanist(color: Colors.white),
+            ),
+            content: Text(
+              'Are you sure you want to delete "${download.title}"?',
+              style: GoogleFonts.urbanist(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _downloads.remove(download);
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _downloads.remove(download);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
-          ),
-        ],
-      ),
     );
   }
 }

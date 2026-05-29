@@ -3,7 +3,7 @@ import 'package:senpai_shows/screens/senpai_bookmarks.dart';
 import 'package:senpai_shows/screens/senpai_downloads.dart';
 import 'package:senpai_shows/screens/senpai_home.dart';
 import 'package:senpai_shows/screens/senpai_search.dart';
-import 'package:senpai_shows/screens/senpai_songs.dart';
+import 'package:senpai_shows/screens/senpai_extensions.dart';
 // import other screens as needed
 import '../components/custom_bottom_nav.dart';
 import '../screens/senpai_profile.dart';
@@ -45,7 +45,7 @@ class _MainNavigationState extends State<MainNavigation> {
           const SenpaiHome(),
           _senpaiSearchScreen,
           SenpaiBookmarks(),
-          SenpaiSongs(),
+          const SenpaiExtensions(),
           SenpaiDownloads(),
           SenpaiProfile(),
         ],
@@ -63,4 +63,3 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 }
-

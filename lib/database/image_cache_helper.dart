@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,7 +11,8 @@ class ImageCacheHelper {
   ImageCacheHelper._internal();
 
   Database? _database;
-  static const int _cacheDurationMs = 2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
+  static const int _cacheDurationMs =
+      2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -41,11 +43,7 @@ class ImageCacheHelper {
   Future<Uint8List?> getCachedImage(String id) async {
     await cleanExpiredImages();
     final db = await database;
-    final result = await db.query(
-      'images',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    final result = await db.query('images', where: 'id = ?', whereArgs: [id]);
     if (result.isNotEmpty) {
       final timestamp = result.first['timestamp'] as int;
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -53,11 +51,7 @@ class ImageCacheHelper {
         return result.first['imageData'] as Uint8List?;
       } else {
         // Delete expired image
-        await db.delete(
-          'images',
-          where: 'id = ?',
-          whereArgs: [id],
-        );
+        await db.delete('images', where: 'id = ?', whereArgs: [id]);
       }
     }
     return null;
@@ -69,19 +63,15 @@ class ImageCacheHelper {
       if (response.statusCode == 200) {
         final imageData = response.bodyBytes;
         final db = await database;
-        await db.insert(
-          'images',
-          {
-            'id': id,
-            'imageUrl': imageUrl,
-            'imageData': imageData,
-            'timestamp': DateTime.now().millisecondsSinceEpoch,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
+        await db.insert('images', {
+          'id': id,
+          'imageUrl': imageUrl,
+          'imageData': imageData,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
       }
     } catch (e) {
-      print('Error caching image $imageUrl: $e');
+      debugPrint('Error caching image $imageUrl: $e');
     }
   }
 
@@ -115,11 +105,7 @@ class ImageCacheHelper {
       if (now - timestamp <= _cacheDurationMs) {
         return result.first['imageData'] as Uint8List?;
       } else {
-        await db.delete(
-          'images',
-          where: 'imageUrl = ?',
-          whereArgs: [imageUrl],
-        );
+        await db.delete('images', where: 'imageUrl = ?', whereArgs: [imageUrl]);
       }
     }
     return null;

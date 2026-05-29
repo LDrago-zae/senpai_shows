@@ -62,7 +62,7 @@ class SenpaiSplashState extends State<SenpaiSplash> with SingleTickerProviderSta
         );
       }
     } catch (e) {
-      print('Auth check error: $e');
+      debugPrint('Auth check error: $e');
       Navigator.pushReplacement(
         context,
         SlideAnimation(

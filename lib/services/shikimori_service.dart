@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/anime_model.dart';
-
 
 class ShikimoriApiService {
   static const String _baseUrl = 'https://shikimori.one/api';
@@ -37,7 +37,11 @@ class ShikimoriApiService {
     }
   }
 
-  Future<List<Anime>> fetchAnimeByGenre(String genre, {int page = 1, int limit = 20}) async {
+  Future<List<Anime>> fetchAnimeByGenre(
+    String genre, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     // Map common genre names to Shikimori genre IDs
     final genreMap = {
       'action': 1,
@@ -88,13 +92,16 @@ class ShikimoriApiService {
     final genreId = genreMap[genre.toLowerCase()];
 
     try {
-      final uri = Uri.parse('$_baseUrl/animes').replace(queryParameters: {
-        'page': page.toString(),
-        'limit': limit.toString(),
-        'order': 'popularity',
-        if (genreId != null) 'genre': genreId.toString(),
-        if (genreId == null) 'search': genre, // Fallback to search if genre ID not found
-      });
+      final uri = Uri.parse('$_baseUrl/animes').replace(
+        queryParameters: {
+          'page': page.toString(),
+          'limit': limit.toString(),
+          'order': 'popularity',
+          if (genreId != null) 'genre': genreId.toString(),
+          if (genreId == null)
+            'search': genre, // Fallback to search if genre ID not found
+        },
+      );
 
       final response = await http.get(
         uri,
@@ -111,9 +118,10 @@ class ShikimoriApiService {
           return Anime(
             id: item['id'],
             title: item['russian'] ?? item['name'] ?? 'Unknown Title',
-            imageUrl: item['image']?['original'] != null
-                ? 'https://shikimori.one${item['image']['original']}'
-                : 'https://via.placeholder.com/300x400',
+            imageUrl:
+                item['image']?['original'] != null
+                    ? 'https://shikimori.one${item['image']['original']}'
+                    : 'https://via.placeholder.com/300x400',
             rating: (item['score'] ?? 0.0).toDouble(),
             episodes: item['episodes'],
             status: _mapShikimoriStatus(item['status']),
@@ -121,16 +129,19 @@ class ShikimoriApiService {
             releaseDate: item['aired_on']?.substring(0, 4),
             genre: (item['genres'] as List?)?.map((g) => g['name']).join(', '),
             rank: 0,
-            starring: (item['studios'] as List?)?.isNotEmpty == true
-                ? item['studios'][0]['name']
-                : 'Unknown Studio',
+            starring:
+                (item['studios'] as List?)?.isNotEmpty == true
+                    ? item['studios'][0]['name']
+                    : 'Unknown Studio',
           );
         }).toList();
       } else {
-        throw Exception('Failed to fetch $genre anime from Shikimori: ${response.statusCode}');
+        throw Exception(
+          'Failed to fetch $genre anime from Shikimori: ${response.statusCode}',
+        );
       }
     } catch (e) {
-      print('Error fetching $genre anime from Shikimori: $e');
+      debugPrint('Error fetching $genre anime from Shikimori: $e');
       throw Exception('Failed to load $genre anime from Shikimori');
     }
   }
@@ -148,14 +159,20 @@ class ShikimoriApiService {
     }
   }
 
-  Future<List<Anime>> searchAnime(String query, {int page = 1, int limit = 10}) async {
+  Future<List<Anime>> searchAnime(
+    String query, {
+    int page = 1,
+    int limit = 10,
+  }) async {
     try {
-      final uri = Uri.parse('$_baseUrl/animes').replace(queryParameters: {
-        'search': query,
-        'page': page.toString(),
-        'limit': limit.toString(),
-        'order': 'popularity',
-      });
+      final uri = Uri.parse('$_baseUrl/animes').replace(
+        queryParameters: {
+          'search': query,
+          'page': page.toString(),
+          'limit': limit.toString(),
+          'order': 'popularity',
+        },
+      );
 
       final response = await http.get(
         uri,
@@ -172,9 +189,10 @@ class ShikimoriApiService {
           return Anime(
             id: item['id'],
             title: item['russian'] ?? item['name'] ?? 'Unknown Title',
-            imageUrl: item['image']?['original'] != null
-                ? 'https://shikimori.one${item['image']['original']}'
-                : 'https://via.placeholder.com/300x400',
+            imageUrl:
+                item['image']?['original'] != null
+                    ? 'https://shikimori.one${item['image']['original']}'
+                    : 'https://via.placeholder.com/300x400',
             rating: (item['score'] ?? 0.0).toDouble(),
             episodes: item['episodes'],
             status: _mapShikimoriStatus(item['status']),
@@ -188,7 +206,7 @@ class ShikimoriApiService {
         throw Exception('Failed to search anime: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error searching anime: $e');
+      debugPrint('Error searching anime: $e');
       return [];
     }
   }

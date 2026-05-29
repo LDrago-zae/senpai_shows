@@ -3,15 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/anime_model.dart';
 import '../controllers/home_controller.dart';
 import '../components/genre_anime_card.dart';
-import '../screens/senpai_home.dart';
 
 class GenreAnimeScreen extends StatefulWidget {
   final String genreName;
 
-  const GenreAnimeScreen({
-    super.key,
-    required this.genreName,
-  });
+  const GenreAnimeScreen({super.key, required this.genreName});
 
   @override
   State<GenreAnimeScreen> createState() => _GenreAnimeScreenState();
@@ -63,9 +59,7 @@ class _GenreAnimeScreenState extends State<GenreAnimeScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.tealAccent,
-                ),
+                child: CircularProgressIndicator(color: Colors.tealAccent),
               );
             }
 
@@ -101,7 +95,9 @@ class _GenreAnimeScreenState extends State<GenreAnimeScreen> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          genreAnimeFuture = _homeController.fetchAnimeByGenre(widget.genreName);
+                          genreAnimeFuture = _homeController.fetchAnimeByGenre(
+                            widget.genreName,
+                          );
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -189,10 +185,7 @@ class _GenreAnimeScreenState extends State<GenreAnimeScreen> {
                     itemCount: animeList.length,
                     itemBuilder: (context, index) {
                       final anime = animeList[index];
-                      return GenreAnimeCard(
-                        anime: anime,
-                        index: index,
-                      );
+                      return GenreAnimeCard(anime: anime, index: index);
                     },
                   ),
                 ),

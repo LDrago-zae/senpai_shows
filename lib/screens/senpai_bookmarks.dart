@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/models/anime_model.dart';
-import 'package:senpai_shows/services/anilist_service.dart';
 
 class SenpaiBookmarks extends StatefulWidget {
   const SenpaiBookmarks({super.key});
@@ -100,7 +98,9 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.tealAccent.withOpacity(0.3)),
+                      border: Border.all(
+                        color: Colors.tealAccent.withOpacity(0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -137,9 +137,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
                   ),
                   const SizedBox(height: 24),
                   // Content Section
-                  Expanded(
-                    child: _buildContent(),
-                  ),
+                  Expanded(child: _buildContent()),
                 ],
               ),
             ),
@@ -152,9 +150,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
   Widget _buildContent() {
     if (_loading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: Colors.tealAccent,
-        ),
+        child: CircularProgressIndicator(color: Colors.tealAccent),
       );
     }
 
@@ -163,11 +159,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.redAccent,
-              size: 60,
-            ),
+            Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
             const SizedBox(height: 16),
             Text(
               _error!,
@@ -195,11 +187,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.bookmark_border,
-              color: Colors.white54,
-              size: 80,
-            ),
+            Icon(Icons.bookmark_border, color: Colors.white54, size: 80),
             const SizedBox(height: 24),
             Text(
               'No Bookmarks Yet',
@@ -213,10 +201,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
             Text(
               'Start exploring anime and bookmark\nyour favorites to see them here!',
               textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+              style: GoogleFonts.urbanist(fontSize: 16, color: Colors.white70),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
@@ -226,7 +211,10 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.tealAccent,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -257,9 +245,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
   Widget _buildAnimeCard(Anime anime) {
     return Card(
       color: Colors.black.withOpacity(0.7),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 8,
       child: Stack(
         children: [
@@ -273,13 +259,19 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
                     ),
                     child: Image.network(
                       anime.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                      errorBuilder:
+                          (context, error, stackTrace) => const Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
                     ),
                   ),
                 ),
@@ -328,11 +320,7 @@ class _SenpaiBookmarksState extends State<SenpaiBookmarks> {
                   color: Colors.red.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 16,
-                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 16),
               ),
             ),
           ),

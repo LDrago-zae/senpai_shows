@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
 import 'package:senpai_shows/layout/main_navigation.dart';
 import 'package:senpai_shows/screens/senpai_signup.dart';
@@ -68,7 +67,9 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text("Login successful!"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             backgroundColor: const Color(0xFF4ECDC4),
             duration: const Duration(seconds: 1),
           ),
@@ -133,7 +134,9 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Welcome, ${userCredential.user!.displayName}!"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             backgroundColor: const Color(0xFF4ECDC4),
             duration: const Duration(seconds: 1),
           ),
@@ -151,7 +154,9 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text("Google Sign-In cancelled by user."),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             backgroundColor: Colors.redAccent,
             duration: const Duration(seconds: 1),
           ),
@@ -169,11 +174,7 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1A1A2E),
-              Color(0xFF16213E),
-              Color(0xFF0F3460),
-            ],
+            colors: [Color(0xFF1A1A2E), Color(0xFF16213E), Color(0xFF0F3460)],
           ),
         ),
         child: SafeArea(
@@ -301,13 +302,17 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                     activeColor: const Color(0xFF4ECDC4),
                                     checkColor: Colors.white,
                                     side: BorderSide(
-                                      color: Colors.white.withValues(alpha: 0.5),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.5,
+                                      ),
                                     ),
                                   ),
                                   Text(
                                     'Remember me',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -327,23 +332,24 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: _isLoading
-                                  ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                                  : const Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                              child:
+                                  _isLoading
+                                      ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                      : const Text(
+                                        'Login',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -356,16 +362,17 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                               children: [
                                 const TextSpan(text: "Don't have an account? "),
                                 TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.push(
-                                        context,
-                                        SlideAnimation(
-                                          page: const SenpaiSignup(),
-                                          direction: AxisDirection.left,
-                                        ),
-                                      );
-                                    },
+                                  recognizer:
+                                      TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Navigator.push(
+                                            context,
+                                            SlideAnimation(
+                                              page: const SenpaiSignup(),
+                                              direction: AxisDirection.left,
+                                            ),
+                                          );
+                                        },
                                   text: "Signup here",
                                   style: const TextStyle(
                                     color: Color(0xFF4ECDC4),
@@ -410,37 +417,46 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 Column(
                                   children: [
                                     GestureDetector(
-                                      onTap: _isMALLoading ? null : _performAniListSignIn,
+                                      onTap:
+                                          _isMALLoading
+                                              ? null
+                                              : _performAniListSignIn,
                                       child: SizedBox(
                                         width: 48,
                                         height: 48,
-                                        child: _isMALLoading
-                                            ? const CircularProgressIndicator(
-                                          color: Color(0xFF4ECDC4),
-                                          strokeWidth: 4,
-                                        )
-                                            : Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.blue.shade900,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Image.asset(
-                                              'assets/icons/anilist.png',
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                        ),
+                                        child:
+                                            _isMALLoading
+                                                ? const CircularProgressIndicator(
+                                                  color: Color(0xFF4ECDC4),
+                                                  strokeWidth: 4,
+                                                )
+                                                : Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.blue.shade900,
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          8.0,
+                                                        ),
+                                                    child: Image.asset(
+                                                      'assets/icons/anilist.png',
+                                                      fit: BoxFit.fill,
+                                                    ),
+                                                  ),
+                                                ),
                                       ),
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
                                       'AniList',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.8),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -450,36 +466,46 @@ class _SenpaiLoginScreenState extends State<SenpaiLogin> {
                                 Column(
                                   children: [
                                     GestureDetector(
-                                      onTap: _isGoogleLoading ? null : _performGoogleSignIn,
+                                      onTap:
+                                          _isGoogleLoading
+                                              ? null
+                                              : _performGoogleSignIn,
                                       child: SizedBox(
                                         width: 48,
                                         height: 48,
-                                        child: _isGoogleLoading
-                                            ? const CircularProgressIndicator(
-                                          color: Color(0xFF4ECDC4),
-                                          strokeWidth: 4,
-                                        )
-                                            : Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: SvgPicture.asset(
-                                              'assets/icons/google.svg',
-                                            ),
-                                          ),
-                                        ),
+                                        child:
+                                            _isGoogleLoading
+                                                ? const CircularProgressIndicator(
+                                                  color: Color(0xFF4ECDC4),
+                                                  strokeWidth: 4,
+                                                )
+                                                : Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white,
+                                                      ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          8.0,
+                                                        ),
+                                                    child: SvgPicture.asset(
+                                                      'assets/icons/google.svg',
+                                                    ),
+                                                  ),
+                                                ),
                                       ),
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
                                       'Google',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.8),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
                                         fontSize: 12,
                                       ),
                                     ),

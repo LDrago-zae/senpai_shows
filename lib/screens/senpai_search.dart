@@ -191,7 +191,7 @@ class _SearchScreenState extends State<SenpaiSearch>
           _isSearching = false;
         });
       }
-      print('Search error: $e');
+      debugPrint('Search error: $e');
     }
   }
 
@@ -233,7 +233,7 @@ class _SearchScreenState extends State<SenpaiSearch>
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -337,7 +337,7 @@ class _SearchScreenState extends State<SenpaiSearch>
         color: const Color.fromARGB(18, 20, 25, 255),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.tealAccent.withOpacity(0.2),
+          color: Colors.tealAccent.withValues(alpha: 0.2),
         ),
       ),
       child: Material(
@@ -509,7 +509,7 @@ class _SearchScreenState extends State<SenpaiSearch>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -536,7 +536,7 @@ class _SearchScreenState extends State<SenpaiSearch>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, color.withOpacity(0.7)],
+                  colors: [Colors.transparent, color.withValues(alpha: 0.7)],
                 ),
               ),
             ),
@@ -553,7 +553,7 @@ class _SearchScreenState extends State<SenpaiSearch>
                   shadows: [
                     Shadow(
                       blurRadius: 8,
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.black.withValues(alpha: 0.8),
                       offset: const Offset(2, 2),
                     ),
                   ],
@@ -564,7 +564,7 @@ class _SearchScreenState extends State<SenpaiSearch>
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  print('Selected genre: $genreName');
+                  debugPrint('Selected genre: $genreName');
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -572,7 +572,7 @@ class _SearchScreenState extends State<SenpaiSearch>
                     ),
                   );
                 },
-                splashColor: color.withOpacity(0.3),
+                splashColor: color.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),

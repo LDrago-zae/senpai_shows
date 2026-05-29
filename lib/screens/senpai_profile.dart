@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:senpai_shows/screens/senpai_extensions.dart'; // Import extensions screen
 
 class SenpaiProfile extends StatefulWidget {
   const SenpaiProfile({super.key});
@@ -75,9 +76,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       body: Stack(
         children: [
           SizedBox.expand(),
-          _currentUser != null
-              ? _buildProfileContent()
-              : _buildLoginPrompt(),
+          _currentUser != null ? _buildProfileContent() : _buildLoginPrompt(),
         ],
       ),
     );
@@ -112,12 +111,12 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.blue.withOpacity(0.2),
-            Colors.indigo.withOpacity(0.1),
+            Colors.blue.withValues(alpha: 0.2),
+            Colors.indigo.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.tealAccent.withOpacity(0.3)),
+        border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -128,26 +127,26 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
                 height: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.tealAccent,
-                    width: 3,
-                  ),
+                  border: Border.all(color: Colors.tealAccent, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
                   ],
                 ),
                 child: ClipOval(
-                  child: _currentUser!.photoURL != null
-                      ? Image.network(
-                    _currentUser!.photoURL!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _defaultAvatar(),
-                  )
-                      : _defaultAvatar(),
+                  child:
+                      _currentUser!.photoURL != null
+                          ? Image.network(
+                            _currentUser!.photoURL!,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) =>
+                                    _defaultAvatar(),
+                          )
+                          : _defaultAvatar(),
                 ),
               ),
               Positioned(
@@ -181,18 +180,12 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           const SizedBox(height: 4),
           Text(
             _currentUser!.email ?? 'No email',
-            style: GoogleFonts.urbanist(
-              fontSize: 16,
-              color: Colors.white70,
-            ),
+            style: GoogleFonts.urbanist(fontSize: 16, color: Colors.white70),
           ),
           const SizedBox(height: 8),
           Text(
             'Member since ${_formatJoinDate(_currentUser!.metadata.creationTime)}',
-            style: GoogleFonts.urbanist(
-              fontSize: 14,
-              color: Colors.tealAccent,
-            ),
+            style: GoogleFonts.urbanist(fontSize: 14, color: Colors.tealAccent),
           ),
         ],
       ),
@@ -235,13 +228,19 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, String subtitle, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -257,17 +256,11 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           ),
           Text(
             title,
-            style: GoogleFonts.urbanist(
-              fontSize: 12,
-              color: Colors.white70,
-            ),
+            style: GoogleFonts.urbanist(fontSize: 12, color: Colors.white70),
           ),
           Text(
             subtitle,
-            style: GoogleFonts.urbanist(
-              fontSize: 10,
-              color: color,
-            ),
+            style: GoogleFonts.urbanist(fontSize: 10, color: color),
           ),
         ],
       ),
@@ -277,61 +270,81 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
   Widget _buildSettingsSection() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           _buildSettingsTile(
+            'Extensions (Aniyomi Mode)',
+            Icons.extension,
+            Colors.tealAccent,
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SenpaiExtensions(),
+                ),
+              );
+            },
+          ),
+          const Divider(color: Colors.white12),
+          _buildSettingsTile(
             'Account Settings',
             Icons.settings,
             Colors.tealAccent,
-                () => _showComingSoon('Account Settings'),
+            () => _showComingSoon('Account Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Notification Preferences',
             Icons.notifications,
             Colors.orangeAccent,
-                () => _showComingSoon('Notification Settings'),
+            () => _showComingSoon('Notification Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Download Settings',
             Icons.download,
             Colors.greenAccent,
-                () => _showComingSoon('Download Settings'),
+            () => _showComingSoon('Download Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Privacy & Security',
             Icons.security,
             Colors.purpleAccent,
-                () => _showComingSoon('Privacy Settings'),
+            () => _showComingSoon('Privacy Settings'),
           ),
           const Divider(color: Colors.white12),
           _buildSettingsTile(
             'Help & Support',
             Icons.help,
             Colors.blueAccent,
-                () => _showComingSoon('Help Center'),
+            () => _showComingSoon('Help Center'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingsTile(String title, IconData icon, Color iconColor, VoidCallback onTap) {
+  Widget _buildSettingsTile(
+    String title,
+    IconData icon,
+    Color iconColor,
+    VoidCallback onTap,
+  ) {
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(
         title,
-        style: GoogleFonts.urbanist(
-          fontSize: 16,
-          color: Colors.white,
-        ),
+        style: GoogleFonts.urbanist(fontSize: 16, color: Colors.white),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: Colors.white54,
+        size: 16,
+      ),
       onTap: onTap,
     );
   }
@@ -393,11 +406,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.person_outline,
-            size: 100,
-            color: Colors.grey[600],
-          ),
+          Icon(Icons.person_outline, size: 100, color: Colors.grey[600]),
           const SizedBox(height: 20),
           Text(
             'Please Sign In',
@@ -410,10 +419,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
           const SizedBox(height: 10),
           Text(
             'Sign in to view your profile',
-            style: GoogleFonts.urbanist(
-              color: Colors.grey[400],
-              fontSize: 16,
-            ),
+            style: GoogleFonts.urbanist(color: Colors.grey[400], fontSize: 16),
           ),
           const SizedBox(height: 30),
           ElevatedButton.icon(
@@ -443,11 +449,7 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
   Widget _defaultAvatar() {
     return Container(
       color: Colors.grey[800],
-      child: Icon(
-        Icons.person,
-        size: 60,
-        color: Colors.grey[400],
-      ),
+      child: Icon(Icons.person, size: 60, color: Colors.grey[400]),
     );
   }
 
@@ -456,24 +458,10 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  String _formatLastSignIn(DateTime? date) {
-    if (date == null) return 'Unknown';
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} hours ago';
-    } else {
-      return '${difference.inMinutes} minutes ago';
-    }
-  }
-
   Future<void> _signInWithGoogle() async {
-    setState(() => _loading = true);
     try {
       final result = await _userService.signInWithGoogle();
+      if (!mounted) return;
       if (result != null) {
         setState(() {
           _currentUser = result.user;
@@ -487,11 +475,10 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign in failed: $e')),
-      );
-    } finally {
-      setState(() => _loading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Sign in failed: $e')));
     }
   }
 
@@ -502,41 +489,42 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Edit Profile',
-              style: GoogleFonts.urbanist(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Profile editing feature coming soon!',
-              style: GoogleFonts.urbanist(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Close',
-                style: GoogleFonts.urbanist(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Edit Profile',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 24),
+                Text(
+                  'Profile editing feature coming soon!',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Close',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -553,59 +541,63 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
   void _showSignOutConfirmation() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey.shade900,
-        title: Text(
-          'Sign Out',
-          style: GoogleFonts.urbanist(color: Colors.white),
-        ),
-        content: Text(
-          'Are you sure you want to sign out?',
-          style: GoogleFonts.urbanist(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.grey.shade900,
+            title: Text(
+              'Sign Out',
               style: GoogleFonts.urbanist(color: Colors.white),
             ),
-          ),
-          TextButton(
-            onPressed: () async {
-              setState(() => _loading = true);
-              try {
-                await _userService.signOut();
-                setState(() {
-                  _currentUser = null;
-                });
-                Navigator.pop(context); // Close dialog
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Signed out successfully'),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    backgroundColor: const Color(0xFF4ECDC4),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Sign-out failed: $e'),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                );
-              } finally {
-                setState(() => _loading = false);
-              }
-            },
-            child: Text(
-              'Sign Out',
-              style: GoogleFonts.urbanist(color: Colors.redAccent),
+            content: Text(
+              'Are you sure you want to sign out?',
+              style: GoogleFonts.urbanist(color: Colors.white70),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.urbanist(color: Colors.white),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  setState(() => _loading = true);
+                  try {
+                    await _userService.signOut();
+                    if (!mounted) return;
+                    setState(() {
+                      _currentUser = null;
+                    });
+                    Navigator.pop(context); // Close dialog
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Signed out successfully'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        backgroundColor: const Color(0xFF4ECDC4),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Sign-out failed: $e'),
+                        backgroundColor: Colors.redAccent,
+                      ),
+                    );
+                  } finally {
+                    setState(() => _loading = false);
+                  }
+                },
+                child: Text(
+                  'Sign Out',
+                  style: GoogleFonts.urbanist(color: Colors.redAccent),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

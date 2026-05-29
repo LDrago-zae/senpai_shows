@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:senpai_shows/components/anime_particle_background.dart';
 import 'package:senpai_shows/firebase/senpai_auth.dart';
 import 'package:senpai_shows/layout/main_navigation.dart';
 import 'senpai_login.dart'; // Hypothetical home screen
@@ -29,15 +28,17 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
 
   Future<void> _performSignUp() async {
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match!")));
       return;
     }
 
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please agree to the terms and conditions.")),
+        const SnackBar(
+          content: Text("Please agree to the terms and conditions."),
+        ),
       );
       return;
     }
@@ -164,11 +165,7 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1A1A2E),
-              Color(0xFF16213E),
-              Color(0xFF0F3460),
-            ],
+            colors: [Color(0xFF1A1A2E), Color(0xFF16213E), Color(0xFF0F3460)],
           ),
         ),
         child: SafeArea(
@@ -334,7 +331,8 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                    _obscureConfirmPassword =
+                                        !_obscureConfirmPassword;
                                   });
                                 },
                                 icon: Icon(
@@ -366,7 +364,9 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 child: RichText(
                                   text: TextSpan(
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
                                       fontSize: 12,
                                     ),
                                     children: [
@@ -397,30 +397,34 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                             width: double.infinity,
                             height: 48,
                             child: ElevatedButton(
-                              onPressed: _isLoading || !_agreeToTerms ? null : _performSignUp,
+                              onPressed:
+                                  _isLoading || !_agreeToTerms
+                                      ? null
+                                      : _performSignUp,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF4ECDC4),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: _isLoading
-                                  ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                                  : const Text(
-                                'Create Account',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                              child:
+                                  _isLoading
+                                      ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                      : const Text(
+                                        'Create Account',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -431,18 +435,21 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 fontSize: 14,
                               ),
                               children: [
-                                const TextSpan(text: "Already have an account? "),
+                                const TextSpan(
+                                  text: "Already have an account? ",
+                                ),
                                 TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        SlideAnimation(
-                                          page: const SenpaiLogin(),
-                                          direction: AxisDirection.right,
-                                        ),
-                                      );
-                                    },
+                                  recognizer:
+                                      TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            SlideAnimation(
+                                              page: const SenpaiLogin(),
+                                              direction: AxisDirection.right,
+                                            ),
+                                          );
+                                        },
                                   text: "Login here",
                                   style: const TextStyle(
                                     color: Color(0xFF4ECDC4),
@@ -487,40 +494,50 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 Column(
                                   children: [
                                     GestureDetector(
-                                      onTap: _isMALLoading ? null : _performAniListSignIn,
+                                      onTap:
+                                          _isMALLoading
+                                              ? null
+                                              : _performAniListSignIn,
                                       child: SizedBox(
                                         width: 48,
                                         height: 48,
-                                        child: _isMALLoading
-                                            ? const CircularProgressIndicator(
-                                          color: Color(0xFF4ECDC4),
-                                          strokeWidth: 4,
-                                        )
-                                            : Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.blue.shade900,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: SvgPicture.asset(
-                                              'assets/icons/myanimelist1.svg',
-                                              colorFilter: const ColorFilter.mode(
-                                                Colors.white,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        child:
+                                            _isMALLoading
+                                                ? const CircularProgressIndicator(
+                                                  color: Color(0xFF4ECDC4),
+                                                  strokeWidth: 4,
+                                                )
+                                                : Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.blue.shade900,
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          12.0,
+                                                        ),
+                                                    child: SvgPicture.asset(
+                                                      'assets/icons/myanimelist1.svg',
+                                                      colorFilter:
+                                                          const ColorFilter.mode(
+                                                            Colors.white,
+                                                            BlendMode.srcIn,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       'MyAnimeList',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.8),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -530,36 +547,46 @@ class _SenpaiSignupScreenState extends State<SenpaiSignup> {
                                 Column(
                                   children: [
                                     GestureDetector(
-                                      onTap: _isGoogleLoading ? null : _performGoogleSignIn,
+                                      onTap:
+                                          _isGoogleLoading
+                                              ? null
+                                              : _performGoogleSignIn,
                                       child: SizedBox(
                                         width: 48,
                                         height: 48,
-                                        child: _isGoogleLoading
-                                            ? const CircularProgressIndicator(
-                                          color: Color(0xFF4ECDC4),
-                                          strokeWidth: 2,
-                                        )
-                                            : Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: SvgPicture.asset(
-                                              'assets/icons/google.svg',
-                                            ),
-                                          ),
-                                        ),
+                                        child:
+                                            _isGoogleLoading
+                                                ? const CircularProgressIndicator(
+                                                  color: Color(0xFF4ECDC4),
+                                                  strokeWidth: 2,
+                                                )
+                                                : Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white,
+                                                      ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          12.0,
+                                                        ),
+                                                    child: SvgPicture.asset(
+                                                      'assets/icons/google.svg',
+                                                    ),
+                                                  ),
+                                                ),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       'Google',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.8),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
                                         fontSize: 12,
                                       ),
                                     ),

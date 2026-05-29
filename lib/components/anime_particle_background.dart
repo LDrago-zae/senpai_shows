@@ -27,12 +27,17 @@ class LightBlackGlassmorphicContainer extends StatelessWidget {
             child: Image.asset(
               imagePath,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.black12,
-                child: const Center(
-                  child: Icon(Icons.error, color: Colors.redAccent, size: 48),
-                ),
-              ),
+              errorBuilder:
+                  (context, error, stackTrace) => Container(
+                    color: Colors.black12,
+                    child: const Center(
+                      child: Icon(
+                        Icons.error,
+                        color: Colors.redAccent,
+                        size: 48,
+                      ),
+                    ),
+                  ),
             ),
           ),
           // Glassmorphic Overlay with BackdropFilter
@@ -49,16 +54,17 @@ class LightBlackGlassmorphicContainer extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Colors.black.withOpacity(0.4),
-                      Colors.black.withOpacity(0.6),
+                      Colors.black.withValues(alpha: 0.4),
+                      Colors.black.withValues(alpha: 0.6),
                     ],
                   ),
-                  border: borderRadius > 0
-                      ? Border.all(
-                    color: Colors.tealAccent.withOpacity(0.3),
-                    width: 1.0,
-                  )
-                      : null,
+                  border:
+                      borderRadius > 0
+                          ? Border.all(
+                            color: Colors.tealAccent.withValues(alpha: 0.3),
+                            width: 1.0,
+                          )
+                          : null,
                   borderRadius: BorderRadius.circular(borderRadius),
                 ),
                 child: child,

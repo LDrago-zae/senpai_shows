@@ -16,13 +16,13 @@ class CustomBottomNav extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
         decoration: BoxDecoration(
-          color: Color.fromARGB(18,20,25,255),
+          color: Color.fromARGB(18, 20, 25, 255),
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(64),
             bottom: Radius.circular(24),
           ),
           border: Border.all(
-            color: Colors.tealAccent.withOpacity(0.5),
+            color: Colors.tealAccent.withValues(alpha: 0.5),
             width: 1,
           ),
           boxShadow: [
@@ -37,7 +37,7 @@ class CustomBottomNav extends StatelessWidget {
           height: 65,
           margin: const EdgeInsets.all(1.5),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(64),
               bottom: Radius.circular(24),
@@ -50,9 +50,21 @@ class CustomBottomNav extends StatelessWidget {
                 children: [
                   _navIcon('assets/icons/home.png', 0, constraints.maxWidth),
                   _navIcon('assets/icons/search.png', 1, constraints.maxWidth),
-                  _navIcon('assets/icons/Bookmark.png', 2, constraints.maxWidth),
-                  _navIcon('assets/icons/music.png', 3, constraints.maxWidth),
-                  _navIcon('assets/icons/Download.png', 4, constraints.maxWidth),
+                  _navIcon(
+                    'assets/icons/Bookmark.png',
+                    2,
+                    constraints.maxWidth,
+                  ),
+                  _navIcon(
+                    'extension',
+                    3,
+                    constraints.maxWidth,
+                  ), // Using indicator for extensions
+                  _navIcon(
+                    'assets/icons/Download.png',
+                    4,
+                    constraints.maxWidth,
+                  ),
                   _navIcon('assets/icons/user.png', 5, constraints.maxWidth),
                 ],
               );
@@ -73,33 +85,56 @@ class CustomBottomNav extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.all(isSelected ? 12 : 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.tealAccent.withOpacity(0.2) : Colors.transparent,
+          color:
+              isSelected
+                  ? Colors.tealAccent.withValues(alpha: 0.2)
+                  : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: SizedBox(
           width: iconSize,
           height: iconSize,
-          child: Image.asset(
-            iconPath,
-            fit: BoxFit.contain,
-            color: isSelected ? Colors.tealAccent : Colors.grey[400],
-            errorBuilder: (context, error, stackTrace) {
-              // Fallback to Material icons if assets not found
-              final fallbackIcons = [
-                Icons.home_max_outlined,
-                Icons.bookmark_border,
-                Icons.save_alt_outlined,
-                Icons.person_outline,
-              ];
-              return Icon(
-                fallbackIcons[index],
-                size: iconSize,
-                color: isSelected ? Colors.tealAccent : Colors.grey[400],
-              );
-            },
-          ),
+          child:
+              iconPath.contains('/')
+                  ? Image.asset(
+                    iconPath,
+                    fit: BoxFit.contain,
+                    color: isSelected ? Colors.tealAccent : Colors.grey[400],
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        _getFallbackIcon(index),
+                        size: iconSize,
+                        color:
+                            isSelected ? Colors.tealAccent : Colors.grey[400],
+                      );
+                    },
+                  )
+                  : Icon(
+                    _getFallbackIcon(index),
+                    size: iconSize,
+                    color: isSelected ? Colors.tealAccent : Colors.grey[400],
+                  ),
         ),
       ),
     );
+  }
+
+  IconData _getFallbackIcon(int index) {
+    switch (index) {
+      case 0:
+        return Icons.home_max_outlined;
+      case 1:
+        return Icons.search;
+      case 2:
+        return Icons.bookmark_border;
+      case 3:
+        return Icons.extension_outlined;
+      case 4:
+        return Icons.save_alt_outlined;
+      case 5:
+        return Icons.person_outline;
+      default:
+        return Icons.error;
+    }
   }
 }

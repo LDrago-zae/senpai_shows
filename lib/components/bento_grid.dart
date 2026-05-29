@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,7 +11,7 @@ class BentoGrid extends StatefulWidget {
   const BentoGrid({super.key, required this.animeList});
 
   @override
-  _BentoGridState createState() => _BentoGridState();
+  State<BentoGrid> createState() => _BentoGridState();
 }
 
 class _BentoGridState extends State<BentoGrid> with TickerProviderStateMixin {
@@ -205,12 +204,12 @@ class _BentoGridState extends State<BentoGrid> with TickerProviderStateMixin {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.tealAccent.withOpacity(0.3),
+              color: Colors.tealAccent.withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -242,7 +241,7 @@ class _BentoGridState extends State<BentoGrid> with TickerProviderStateMixin {
                       ),
                 ),
                 // Glassmorphic Overlay
-                Container(color: Colors.black.withOpacity(0.3)),
+                Container(color: Colors.black.withValues(alpha: 0.3)),
                 // Content
                 Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -270,7 +269,7 @@ class _BentoGridState extends State<BentoGrid> with TickerProviderStateMixin {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.tealAccent.withOpacity(0.3),
+                            color: Colors.tealAccent.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

@@ -11,10 +11,11 @@ class FeaturedBanner extends StatefulWidget {
   const FeaturedBanner({super.key, required this.fetchAnime});
 
   @override
-  _FeaturedBannerState createState() => _FeaturedBannerState();
+  State<FeaturedBanner> createState() => _FeaturedBannerState();
 }
 
-class _FeaturedBannerState extends State<FeaturedBanner> with TickerProviderStateMixin {
+class _FeaturedBannerState extends State<FeaturedBanner>
+    with TickerProviderStateMixin {
   late PageController pageController;
   late List<AnimationController> _pageControllers;
   late List<Animation<double>> _opacities;
@@ -39,14 +40,31 @@ class _FeaturedBannerState extends State<FeaturedBanner> with TickerProviderStat
   }
 
   void _initAnimations(int count) {
-    _pageControllers
-        .addAll(List.generate(count, (index) => AnimationController(vsync: this, duration: Duration(milliseconds: 500))));
-    _opacities = _pageControllers.map((controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeIn),
-    )).toList();
-    _scales = _pageControllers.map((controller) => Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeOutBack),
-    )).toList();
+    _pageControllers.addAll(
+      List.generate(
+        count,
+        (index) => AnimationController(
+          vsync: this,
+          duration: Duration(milliseconds: 500),
+        ),
+      ),
+    );
+    _opacities =
+        _pageControllers
+            .map(
+              (controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeIn),
+              ),
+            )
+            .toList();
+    _scales =
+        _pageControllers
+            .map(
+              (controller) => Tween<double>(begin: 0.8, end: 1.0).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeOutBack),
+              ),
+            )
+            .toList();
 
     // Trigger first animation
     if (_pageControllers.isNotEmpty) {
@@ -136,16 +154,20 @@ class _FeaturedBannerState extends State<FeaturedBanner> with TickerProviderStat
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => SenpaiDetailsScreen(
-                                    anime: AnimeModel(
-                                      title: anime.title,
-                                      genre: anime.genre ?? 'Unknown',
-                                      imagePath: anime.imageUrl,
-                                      synopsis: anime.synopsis ?? 'No synopsis available.',
-                                      releaseDate: anime.releaseDate ?? 'Unknown',
-                                      starring: anime.starring ?? 'N/A',
-                                    ),
-                                  ),
+                                  builder:
+                                      (_) => SenpaiDetailsScreen(
+                                        anime: AnimeModel(
+                                          title: anime.title,
+                                          genre: anime.genre ?? 'Unknown',
+                                          imagePath: anime.imageUrl,
+                                          synopsis:
+                                              anime.synopsis ??
+                                              'No synopsis available.',
+                                          releaseDate:
+                                              anime.releaseDate ?? 'Unknown',
+                                          starring: anime.starring ?? 'N/A',
+                                        ),
+                                      ),
                                 ),
                               );
                             },
@@ -168,25 +190,41 @@ class _FeaturedBannerState extends State<FeaturedBanner> with TickerProviderStat
                                         height: 400,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
-                                        loadingBuilder: (context, child, loadingProgress) {
-                                          if (loadingProgress == null) return child;
+                                        loadingBuilder: (
+                                          context,
+                                          child,
+                                          loadingProgress,
+                                        ) {
+                                          if (loadingProgress == null)
+                                            return child;
                                           return Container(
                                             color: Colors.grey[900],
                                             child: Center(
                                               child: CircularProgressIndicator(
-                                                value: loadingProgress.expectedTotalBytes != null
-                                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                    : null,
+                                                value:
+                                                    loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
                                               ),
                                             ),
                                           );
                                         },
-                                        errorBuilder: (context, error, stackTrace) => Container(
-                                          color: Colors.grey[900],
-                                          child: const Center(
-                                            child: Icon(Icons.broken_image, color: Colors.grey),
-                                          ),
-                                        ),
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Container(
+                                                  color: Colors.grey[900],
+                                                  child: const Center(
+                                                    child: Icon(
+                                                      Icons.broken_image,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ),
                                       ),
                                     ),
                                     Container(
@@ -268,7 +306,10 @@ class _FeaturedBannerState extends State<FeaturedBanner> with TickerProviderStat
                   right: 0,
                   child: Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(12),
@@ -294,10 +335,10 @@ class PageIndicator extends StatelessWidget {
   final int itemCount;
 
   const PageIndicator({
-    Key? key,
+    super.key,
     required this.controller,
     required this.itemCount,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

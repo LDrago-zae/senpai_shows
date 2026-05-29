@@ -114,7 +114,7 @@ class _GenreAnimeCardState extends State<GenreAnimeCard>
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.tealAccent.withOpacity(0.3),
+            color: Colors.tealAccent.withValues(alpha: 0.3),
             width: 1,
           ),
           color: const Color.fromARGB(18, 20, 25, 255),
@@ -244,7 +244,7 @@ class _GenreAnimeCardState extends State<GenreAnimeCard>
                                   vertical: 3
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.tealAccent.withOpacity(0.2),
+                                color: Colors.tealAccent.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(

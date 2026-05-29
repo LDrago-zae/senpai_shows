@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:senpai_shows/controllers/randome_anime_controller.dart';
 import 'package:senpai_shows/models/anime_model.dart';
 import 'package:senpai_shows/services/anilist_service.dart';
 import 'package:senpai_shows/services/shikimori_service.dart';
 import 'package:senpai_shows/services/kitsu_service.dart';
-
 
 class HomeController {
   final AniListApiService _aniListService = AniListApiService();
@@ -20,7 +20,9 @@ class HomeController {
     if (_cachedPopularAnime != null) {
       return _cachedPopularAnime!;
     }
-    final fetchedAnime = await _aniListService.fetchPopularAnime(perPage: perPage);
+    final fetchedAnime = await _aniListService.fetchPopularAnime(
+      perPage: perPage,
+    );
     _cachedPopularAnime = fetchedAnime;
     return fetchedAnime;
   }
@@ -29,7 +31,9 @@ class HomeController {
     if (_cachedRecentAnime != null) {
       return _cachedRecentAnime!;
     }
-    final fetchedAnime = await _aniListService.fetchRecentAnime(perPage: perPage);
+    final fetchedAnime = await _aniListService.fetchRecentAnime(
+      perPage: perPage,
+    );
     _cachedRecentAnime = fetchedAnime;
     return fetchedAnime;
   }
@@ -38,7 +42,9 @@ class HomeController {
     if (_cachedShikimoriPopularAnime != null) {
       return _cachedShikimoriPopularAnime!;
     }
-    final fetchedAnime = await _shikimoriService.fetchPopularAnime(limit: limit);
+    final fetchedAnime = await _shikimoriService.fetchPopularAnime(
+      limit: limit,
+    );
     _cachedShikimoriPopularAnime = fetchedAnime;
     return fetchedAnime;
   }
@@ -68,7 +74,11 @@ class HomeController {
     return await _randomAnimeController.fetchRandomAnime();
   }
 
-  Future<List<Anime>> fetchAnimeByGenre(String genre, {String source = 'anilist', int perPage = 20}) async {
+  Future<List<Anime>> fetchAnimeByGenre(
+    String genre, {
+    String source = 'anilist',
+    int perPage = 20,
+  }) async {
     switch (source.toLowerCase()) {
       case 'anilist':
         return await _aniListService.fetchAnimeByGenre(genre, perPage: perPage);
@@ -81,8 +91,11 @@ class HomeController {
     }
   }
 
-// Fetch from multiple sources and combine
-  Future<List<Anime>> fetchAnimeByGenreMultiSource(String genre, {int perPage = 15}) async {
+  // Fetch from multiple sources and combine
+  Future<List<Anime>> fetchAnimeByGenreMultiSource(
+    String genre, {
+    int perPage = 15,
+  }) async {
     try {
       final results = await Future.wait([
         _aniListService.fetchAnimeByGenre(genre, perPage: perPage ~/ 2),
@@ -102,13 +115,16 @@ class HomeController {
 
       return uniqueAnime.values.toList();
     } catch (e) {
-      print('Error fetching from multiple sources: $e');
+      debugPrint('Error fetching from multiple sources: $e');
       // Fallback to single source
       return await _aniListService.fetchAnimeByGenre(genre, perPage: perPage);
     }
   }
 
-  Future<List<Anime>> searchAnime(String query, {String source = 'anilist'}) async {
+  Future<List<Anime>> searchAnime(
+    String query, {
+    String source = 'anilist',
+  }) async {
     if (query.trim().isEmpty) {
       return [];
     }

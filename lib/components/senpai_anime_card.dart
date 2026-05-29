@@ -94,7 +94,7 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> {
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.tealAccent.withOpacity(0.5),
+            color: Colors.tealAccent.withValues(alpha: 0.5),
             width: 1,
           ),
           color: const Color.fromARGB(18, 20, 25, 255),
@@ -227,7 +227,7 @@ class _SenpaiAnimeCardState extends State<SenpaiAnimeCard> {
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.tealAccent.withOpacity(0.2),
+                            color: Colors.tealAccent.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

@@ -1,5 +1,19 @@
 export 'package:flutter_js/flutter_js.dart';
 
+class ExtensionRepoConfig {
+  final String id;
+  final String name;
+  final String baseUrl;
+  final String type;
+
+  const ExtensionRepoConfig({
+    required this.id,
+    required this.name,
+    required this.baseUrl,
+    required this.type,
+  });
+}
+
 abstract class ExtensionSource {
   final String id;
   final String name;
@@ -62,6 +76,10 @@ class ExtensionRepoItem {
   final String version;
   final int nsfw;
   final List<ExtensionRepoSource> sources;
+  final String repoId;
+  final String repoName;
+  final String repoUrl;
+  final String repoType;
 
   ExtensionRepoItem({
     required this.name,
@@ -72,6 +90,10 @@ class ExtensionRepoItem {
     required this.version,
     required this.nsfw,
     required this.sources,
+    this.repoId = '',
+    this.repoName = '',
+    this.repoUrl = '',
+    this.repoType = '',
   });
 
   factory ExtensionRepoItem.fromJson(Map<String, dynamic> json) {
@@ -97,6 +119,32 @@ class ExtensionRepoItem {
       version: json['version'] ?? '',
       nsfw: json['nsfw'] ?? 0,
       sources: sources,
+      repoId: json['repoId'] ?? '',
+      repoName: json['repoName'] ?? '',
+      repoUrl: json['repoUrl'] ?? '',
+      repoType: json['repoType'] ?? '',
+    );
+  }
+
+  ExtensionRepoItem copyWith({
+    String? repoId,
+    String? repoName,
+    String? repoUrl,
+    String? repoType,
+  }) {
+    return ExtensionRepoItem(
+      name: name,
+      pkg: pkg,
+      apk: apk,
+      lang: lang,
+      code: code,
+      version: version,
+      nsfw: nsfw,
+      sources: sources,
+      repoId: repoId ?? this.repoId,
+      repoName: repoName ?? this.repoName,
+      repoUrl: repoUrl ?? this.repoUrl,
+      repoType: repoType ?? this.repoType,
     );
   }
 }

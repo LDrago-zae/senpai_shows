@@ -1,6 +1,6 @@
 const source = {
-    name: "Yuzono Anime Repo",
-    baseUrl: "https://raw.githubusercontent.com/yuzono/anime-repo/repo",
+    name: "Extensions Repo",
+    baseUrl: "",
 
     fetchExtensionIndex: async function() {
         const response = await httpClient.get(this.baseUrl + "/index.min.json");

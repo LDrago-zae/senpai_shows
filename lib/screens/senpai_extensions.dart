@@ -17,7 +17,29 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
   List<ExtensionRepoItem> _extensions = [];
   bool _isLoading = false;
   String _query = '';
-  String _selectedRepoType = 'anime'; // 'anime' or 'manga'
+  String _selectedRepoType = 'all'; // 'all', 'anime', 'manga'
+  String _selectedRepoId = 'all';
+
+  final List<ExtensionRepoConfig> _repoConfigs = const [
+    ExtensionRepoConfig(
+      id: 'yuzono-anime',
+      name: 'Yuzono Anime Repo',
+      baseUrl: 'https://raw.githubusercontent.com/yuzono/anime-repo/repo',
+      type: 'anime',
+    ),
+    ExtensionRepoConfig(
+      id: 'aniyomi',
+      name: 'Aniyomi Extensions',
+      baseUrl: 'https://raw.githubusercontent.com/aniyomiorg/aniyomi-extensions/repo',
+      type: 'mixed',
+    ),
+    ExtensionRepoConfig(
+      id: 'keiyoushi',
+      name: 'Keiyoushi Extensions',
+      baseUrl: 'https://raw.githubusercontent.com/keiyoushi/extensions/repo',
+      type: 'manga',
+    ),
+  ];
 
   final List<Color> _accentColors = const [
     Color(0xFF22D3EE),
@@ -37,19 +59,10 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
     await _extensionService.loadExtensionFromAssets(
       'assets/extensions/yuzono_repo.js',
     );
-    
-    final String repoUrl = _selectedRepoType == 'anime'
-        ? 'https://raw.githubusercontent.com/yuzono/anime-repo/repo'
-        : 'https://raw.githubusercontent.com/yuzono/manga-repo/repo';
-    final String repoName = _selectedRepoType == 'anime'
-        ? 'Yuzono Anime Repo'
-        : 'Yuzono Manga Repo';
-        
-    await _extensionService.flutterJs.evaluateAsync(
-      "source.baseUrl = '$repoUrl'; source.name = '$repoName';",
-    );
 
-    final extensions = await _extensionService.fetchExtensionIndex();
+    final extensions = await _extensionService.fetchExtensionIndexes(
+      _repoConfigs,
+    );
     if (!mounted) return;
     setState(() {
       _extensions = extensions;
@@ -65,10 +78,23 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
   }
 
   List<ExtensionRepoItem> get _filteredExtensions {
-    if (_query.isEmpty) return _extensions;
+    Iterable<ExtensionRepoItem> results = _extensions;
+
+    if (_selectedRepoId != 'all') {
+      results = results.where((item) => item.repoId == _selectedRepoId);
+    }
+
+    if (_selectedRepoType != 'all') {
+      results = results.where(
+        (item) =>
+            item.repoType == _selectedRepoType || item.repoType == 'mixed',
+      );
+    }
+
+    if (_query.isEmpty) return results.toList();
     final normalized = _query.toLowerCase();
 
-    return _extensions.where((item) {
+    return results.where((item) {
       final nameMatch = item.name.toLowerCase().contains(normalized);
       final pkgMatch = item.pkg.toLowerCase().contains(normalized);
       final sourceMatch = item.sources.any(
@@ -78,6 +104,27 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
       );
       return nameMatch || pkgMatch || sourceMatch;
     }).toList();
+  }
+
+  String get _selectedRepoName {
+    if (_selectedRepoId == 'all') return 'All repos';
+    final repo = _repoConfigs.firstWhere(
+      (config) => config.id == _selectedRepoId,
+      orElse: () => _repoConfigs.first,
+    );
+    return repo.name;
+  }
+
+  bool get _hasActiveFilters {
+    return _query.isNotEmpty ||
+        _selectedRepoId != 'all' ||
+        _selectedRepoType != 'all';
+  }
+
+  bool _resolveIsManga(ExtensionRepoItem item) {
+    if (item.repoType == 'manga') return true;
+    if (item.repoType == 'anime') return false;
+    return _selectedRepoType == 'manga';
   }
 
   @override
@@ -124,6 +171,7 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
                 slivers: [
                   SliverToBoxAdapter(child: _buildHeader()),
                   SliverToBoxAdapter(child: _buildRepoToggle()),
+                  SliverToBoxAdapter(child: _buildRepoFilters()),
                   SliverToBoxAdapter(child: _buildSearchBar()),
                   SliverToBoxAdapter(child: _buildStatsRow(filtered)),
                   ..._buildContentSlivers(filtered),
@@ -182,7 +230,7 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Browse the Yuzono repo index and its bundled sources.',
+            'Browse curated extension repos from Yuzono, Aniyomi, and Keiyoushi.',
             style: GoogleFonts.urbanist(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 16),
@@ -192,7 +240,14 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
             children: [
               _buildPill(
                 icon: Icons.cloud_done_outlined,
-                label: 'Yuzono $_selectedRepoType repo',
+                label: _selectedRepoName,
+              ),
+              _buildPill(
+                icon: Icons.category_outlined,
+                label:
+                    _selectedRepoType == 'all'
+                        ? 'All types'
+                        : _selectedRepoType.toUpperCase(),
               ),
               _buildPill(
                 icon: Icons.extension_outlined,
@@ -219,6 +274,21 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
           children: [
             Expanded(
               child: _buildToggleButton(
+                label: 'All',
+                icon: Icons.dashboard_outlined,
+                isActive: _selectedRepoType == 'all',
+                activeColor: const Color(0xFF38BDF8),
+                onTap: () {
+                  if (_selectedRepoType != 'all') {
+                    setState(() {
+                      _selectedRepoType = 'all';
+                    });
+                  }
+                },
+              ),
+            ),
+            Expanded(
+              child: _buildToggleButton(
                 label: 'Anime',
                 icon: Icons.movie_outlined,
                 isActive: _selectedRepoType == 'anime',
@@ -228,7 +298,6 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
                     setState(() {
                       _selectedRepoType = 'anime';
                     });
-                    _loadExtensionIndex();
                   }
                 },
               ),
@@ -244,12 +313,67 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
                     setState(() {
                       _selectedRepoType = 'manga';
                     });
-                    _loadExtensionIndex();
                   }
                 },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRepoFilters() {
+    final chips = <Widget>[
+      _buildRepoChip(
+        label: 'All repos',
+        isActive: _selectedRepoId == 'all',
+        onTap: () => setState(() => _selectedRepoId = 'all'),
+      ),
+      ..._repoConfigs.map(
+        (repo) => _buildRepoChip(
+          label: repo.name,
+          isActive: _selectedRepoId == repo.id,
+          onTap: () => setState(() => _selectedRepoId = repo.id),
+        ),
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: Wrap(spacing: 10, runSpacing: 10, children: chips),
+    );
+  }
+
+  Widget _buildRepoChip({
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    final color = isActive ? const Color(0xFF22D3EE) : Colors.white54;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color:
+              isActive
+                  ? const Color(0xFF22D3EE).withValues(alpha: 0.18)
+                  : const Color(0xFF0B0F1A).withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: isActive ? color : Colors.white.withValues(alpha: 0.12),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.urbanist(
+            color: isActive ? Colors.white : Colors.white70,
+            fontSize: 12,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -378,12 +502,13 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
 
   Widget _buildStatsRow(List<ExtensionRepoItem> items) {
     final totalExtensions = _extensions.length;
-    final totalSources = _extensions.fold<int>(
+    final summaryItems = _hasActiveFilters ? items : _extensions;
+    final totalSources = summaryItems.fold<int>(
       0,
       (sum, item) => sum + item.sources.length,
     );
-    final nsfwCount = _extensions.where((item) => item.nsfw == 1).length;
-    final showLabel = _query.isNotEmpty && totalExtensions > 0;
+    final nsfwCount = summaryItems.where((item) => item.nsfw == 1).length;
+    final showLabel = _hasActiveFilters && totalExtensions > 0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
@@ -563,6 +688,9 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
     final remaining = item.sources.length - visibleSources.length;
 
     final tags = <Widget>[
+      if (item.repoName.isNotEmpty) _buildTag(item.repoName, accent),
+      if (item.repoType.isNotEmpty)
+        _buildTag(item.repoType.toUpperCase(), accent),
       _buildTag((item.lang.isEmpty ? 'ALL' : item.lang.toUpperCase()), accent),
       if (item.version.isNotEmpty) _buildTag('v${item.version}', accent),
       _buildTag('${item.sources.length} sources', accent),
@@ -815,7 +943,7 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
                               MaterialPageRoute(
                                 builder: (context) => SourceDetailsScreen(
                                   source: source,
-                                  isManga: _selectedRepoType == 'manga',
+                                  isManga: _resolveIsManga(item),
                                 ),
                               ),
                             );

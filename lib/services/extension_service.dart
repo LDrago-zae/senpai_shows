@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:senpai_shows/models/source_interface.dart';
 import 'package:http/http.dart' as http;
 
 class ExtensionService {
   late JavascriptRuntime flutterJs;
+  static const MethodChannel _extensionChannel = MethodChannel(
+    'senpai/extensions',
+  );
 
   ExtensionService() {
     initJsEngine();
@@ -157,7 +161,81 @@ class ExtensionService {
     }
   }
 
+  Future<List<ExtensionRepoItem>> fetchExtensionIndexForRepo(
+    ExtensionRepoConfig repo,
+  ) async {
+    await flutterJs.evaluateAsync(
+      'source.baseUrl = ${jsonEncode(repo.baseUrl)}; '
+      'source.name = ${jsonEncode(repo.name)};'
+    );
+
+    final items = await fetchExtensionIndex();
+    return items
+        .map(
+          (item) => item.copyWith(
+            repoId: repo.id,
+            repoName: repo.name,
+            repoUrl: repo.baseUrl,
+            repoType: repo.type,
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<ExtensionRepoItem>> fetchExtensionIndexes(
+    List<ExtensionRepoConfig> repos,
+  ) async {
+    final results = <ExtensionRepoItem>[];
+    for (final repo in repos) {
+      results.addAll(await fetchExtensionIndexForRepo(repo));
+    }
+    return results;
+  }
+
   void dispose() {
     flutterJs.dispose();
+  }
+
+  bool get isAndroidRuntimeAvailable {
+    return !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  }
+
+  Future<Map<String, dynamic>?> downloadExtensionApk({
+    required String apkUrl,
+    required String pkgName,
+  }) async {
+    if (!isAndroidRuntimeAvailable) return null;
+    final result = await _extensionChannel.invokeMethod<Map>(
+      'downloadExtension',
+      {'apkUrl': apkUrl, 'pkgName': pkgName},
+    );
+    return result?.cast<String, dynamic>();
+  }
+
+  Future<List<Map<String, dynamic>>> listInstalledExtensions() async {
+    if (!isAndroidRuntimeAvailable) return [];
+    final result = await _extensionChannel.invokeMethod<List>(
+      'listInstalledExtensions',
+    );
+    return result
+            ?.whereType<Map>()
+            .map((item) => item.cast<String, dynamic>())
+            .toList() ??
+        [];
+  }
+
+  Future<List<Map<String, dynamic>>> listExtensionSources({
+    required String pkgName,
+  }) async {
+    if (!isAndroidRuntimeAvailable) return [];
+    final result = await _extensionChannel.invokeMethod<List>(
+      'listExtensionSources',
+      {'pkgName': pkgName},
+    );
+    return result
+            ?.whereType<Map>()
+            .map((item) => item.cast<String, dynamic>())
+            .toList() ??
+        [];
   }
 }

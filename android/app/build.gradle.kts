@@ -47,3 +47,12 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("org.jsoup:jsoup:1.22.1")
+    implementation("io.reactivex:rxjava:1.3.8")
+    implementation("io.reactivex:rxandroid:1.2.1")
+    implementation("com.github.null2264.injekt:injekt-core:4135455a2a")
+    implementation("androidx.preference:preference-ktx:1.2.1")
+}

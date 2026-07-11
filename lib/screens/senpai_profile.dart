@@ -14,7 +14,6 @@ class SenpaiProfile extends StatefulWidget {
 class _SenpaiProfileState extends State<SenpaiProfile> {
   final UserService _userService = UserService();
   User? _currentUser;
-  bool _loading = false;
 
   // Sample user data for additional stats (replace with actual data from your backend)
   final Map<String, dynamic> _userProfile = {
@@ -562,7 +561,6 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
               ),
               TextButton(
                 onPressed: () async {
-                  setState(() => _loading = true);
                   try {
                     await _userService.signOut();
                     if (!mounted) return;
@@ -587,8 +585,6 @@ class _SenpaiProfileState extends State<SenpaiProfile> {
                         backgroundColor: Colors.redAccent,
                       ),
                     );
-                  } finally {
-                    setState(() => _loading = false);
                   }
                 },
                 child: Text(

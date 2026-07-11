@@ -11,5 +11,5 @@ void main() async {
       });
     })
   ''');
-  print('Result: \');
+  print('Result: $result');
 }

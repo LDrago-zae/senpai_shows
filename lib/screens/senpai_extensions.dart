@@ -19,6 +19,8 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
   String _query = '';
   String _selectedRepoType = 'all'; // 'all', 'anime', 'manga'
   String _selectedRepoId = 'all';
+  Set<String> _installedPkgs = {};
+  Set<String> _installingPkgs = {};
 
   final List<ExtensionRepoConfig> _repoConfigs = const [
     ExtensionRepoConfig(
@@ -30,7 +32,8 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
     ExtensionRepoConfig(
       id: 'aniyomi',
       name: 'Aniyomi Extensions',
-      baseUrl: 'https://raw.githubusercontent.com/aniyomiorg/aniyomi-extensions/repo',
+      baseUrl:
+          'https://raw.githubusercontent.com/aniyomiorg/aniyomi-extensions/repo',
       type: 'mixed',
     ),
     ExtensionRepoConfig(
@@ -51,7 +54,67 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
   @override
   void initState() {
     super.initState();
+    _loadInstalledExtensions();
     _loadExtensionIndex();
+  }
+
+  Future<void> _loadInstalledExtensions() async {
+    try {
+      final installed = await _extensionService.listInstalledExtensions();
+      final pkgs = installed.map((ext) => ext['pkgName'] as String).toSet();
+      if (mounted) {
+        setState(() {
+          _installedPkgs = pkgs;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading installed extensions: $e');
+    }
+  }
+
+  Future<void> _installExtension(ExtensionRepoItem item) async {
+    if (_installingPkgs.contains(item.pkg)) return;
+    setState(() {
+      _installingPkgs.add(item.pkg);
+    });
+    try {
+      final apkUrl = "${item.repoUrl}/apk/${item.apk}";
+      debugPrint(
+        '[SenpaiExtensions] Installing extension ${item.name} from $apkUrl...',
+      );
+      final result = await _extensionService.downloadExtensionApk(
+        apkUrl: apkUrl,
+        pkgName: item.pkg,
+      );
+      if (result != null && result['apkPath'] != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully installed ${item.name}!'),
+              backgroundColor: const Color(0xFF84CC16),
+            ),
+          );
+        }
+        await _loadInstalledExtensions();
+      } else {
+        throw Exception('Failed to save downloaded file.');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to install ${item.name}: $e'),
+            backgroundColor: const Color(0xFFEF4444),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _installingPkgs.remove(item.pkg);
+        });
+      }
+    }
   }
 
   Future<void> _loadExtensionIndex() async {
@@ -63,6 +126,7 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
     final extensions = await _extensionService.fetchExtensionIndexes(
       _repoConfigs,
     );
+    await _loadInstalledExtensions();
     if (!mounted) return;
     setState(() {
       _extensions = extensions;
@@ -392,20 +456,25 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          gradient: isActive
-              ? LinearGradient(
-                  colors: [
-                    activeColor.withValues(alpha: 0.25),
-                    activeColor.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
+          gradient:
+              isActive
+                  ? LinearGradient(
+                    colors: [
+                      activeColor.withValues(alpha: 0.25),
+                      activeColor.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
           borderRadius: BorderRadius.circular(12),
-          border: isActive
-              ? Border.all(color: activeColor.withValues(alpha: 0.5), width: 1.5)
-              : Border.all(color: Colors.transparent, width: 1.5),
+          border:
+              isActive
+                  ? Border.all(
+                    color: activeColor.withValues(alpha: 0.5),
+                    width: 1.5,
+                  )
+                  : Border.all(color: Colors.transparent, width: 1.5),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -754,7 +823,84 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Colors.white38),
+                const SizedBox(width: 12),
+                () {
+                  final isInstalled = _installedPkgs.contains(item.pkg);
+                  final isInstalling = _installingPkgs.contains(item.pkg);
+
+                  Widget actionWidget;
+                  if (isInstalling) {
+                    actionWidget = const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFF22D3EE),
+                      ),
+                    );
+                  } else if (isInstalled) {
+                    actionWidget = Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF84CC16).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: const Color(0xFF84CC16).withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.check,
+                            size: 10,
+                            color: Color(0xFF84CC16),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Installed',
+                            style: GoogleFonts.urbanist(
+                              color: const Color(0xFF84CC16),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    actionWidget = ElevatedButton(
+                      onPressed: () => _installExtension(item),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accent.withValues(alpha: 0.15),
+                        foregroundColor: accent,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        side: BorderSide(color: accent.withValues(alpha: 0.4)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Install',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return actionWidget;
+                }(),
               ],
             ),
             const SizedBox(height: 12),
@@ -937,14 +1083,29 @@ class _SenpaiExtensionsState extends State<SenpaiExtensions> {
 
                         return InkWell(
                           onTap: () {
+                            final isInstalled = _installedPkgs.contains(
+                              item.pkg,
+                            );
+                            if (!isInstalled) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Please install ${item.name} first.',
+                                  ),
+                                  backgroundColor: const Color(0xFFEF4444),
+                                ),
+                              );
+                              return;
+                            }
                             Navigator.pop(context); // Close bottom sheet
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SourceDetailsScreen(
-                                  source: source,
-                                  isManga: _resolveIsManga(item),
-                                ),
+                                builder:
+                                    (context) => SourceDetailsScreen(
+                                      source: source,
+                                      isManga: _resolveIsManga(item),
+                                    ),
                               ),
                             );
                           },

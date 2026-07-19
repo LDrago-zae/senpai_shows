@@ -12,6 +12,7 @@ class SenpaiDetailsScreen extends StatefulWidget {
   final bool isFromExtension;
   final String? contentUrl;
   final String? sourceName;
+  final String? sourceId;
 
   const SenpaiDetailsScreen({
     super.key,
@@ -19,6 +20,7 @@ class SenpaiDetailsScreen extends StatefulWidget {
     this.isFromExtension = false,
     this.contentUrl,
     this.sourceName,
+    this.sourceId,
   });
 
   @override
@@ -47,27 +49,53 @@ class _SenpaiDetailsScreenState extends State<SenpaiDetailsScreen> {
     setState(() => _isLoadingContent = true);
     try {
       if (widget.isFromExtension) {
-        await _extensionService.loadExtensionFromAssets('assets/extensions/sample_source.js');
-        if (widget.sourceName != null) {
-          await _extensionService.flutterJs.evaluateAsync(
-            "source.name = '${widget.sourceName}';"
-          );
-        }
-
-        if (widget.anime.genre == 'Manga') {
-          final pages = await _extensionService.getMangaPages(widget.contentUrl ?? '');
-          if (!mounted) return;
-          setState(() {
-            _mangaPages = pages.map((p) => p.imageUrl).toList();
-            _isLoadingContent = false;
-          });
+        if (widget.sourceId != null && widget.sourceId!.isNotEmpty) {
+          // Native source loading
+          if (widget.anime.genre == 'Manga') {
+            final pages = await _extensionService.getMangaPagesNative(
+              sourceId: widget.sourceId!,
+              chapterUrl: widget.contentUrl ?? '',
+            );
+            if (!mounted) return;
+            setState(() {
+              _mangaPages = pages.map((p) => p.imageUrl).toList();
+              _isLoadingContent = false;
+            });
+          } else {
+            final episodes = await _extensionService.getEpisodesNative(
+              sourceId: widget.sourceId!,
+              animeUrl: widget.contentUrl ?? '',
+            );
+            if (!mounted) return;
+            setState(() {
+              _episodes = episodes;
+              _isLoadingContent = false;
+            });
+          }
         } else {
-          final episodes = await _extensionService.getEpisodes(widget.contentUrl ?? '');
-          if (!mounted) return;
-          setState(() {
-            _episodes = episodes;
-            _isLoadingContent = false;
-          });
+          // JS Sample source loading
+          await _extensionService.loadExtensionFromAssets('assets/extensions/sample_source.js');
+          if (widget.sourceName != null) {
+            await _extensionService.flutterJs.evaluateAsync(
+              "source.name = '${widget.sourceName}';"
+            );
+          }
+
+          if (widget.anime.genre == 'Manga') {
+            final pages = await _extensionService.getMangaPages(widget.contentUrl ?? '');
+            if (!mounted) return;
+            setState(() {
+              _mangaPages = pages.map((p) => p.imageUrl).toList();
+              _isLoadingContent = false;
+            });
+          } else {
+            final episodes = await _extensionService.getEpisodes(widget.contentUrl ?? '');
+            if (!mounted) return;
+            setState(() {
+              _episodes = episodes;
+              _isLoadingContent = false;
+            });
+          }
         }
       } else {
         // Fallback for homepage items to make them playable/readable
@@ -108,9 +136,21 @@ class _SenpaiDetailsScreenState extends State<SenpaiDetailsScreen> {
     try {
       String videoUrl = ep.url;
       if (widget.isFromExtension) {
-        final videoSources = await _extensionService.getVideoSources(ep.url);
-        if (videoSources.isNotEmpty) {
-          videoUrl = videoSources.first.url;
+        if (widget.sourceId != null && widget.sourceId!.isNotEmpty) {
+          // Native video source loading
+          final videoSources = await _extensionService.getVideoSourcesNative(
+            sourceId: widget.sourceId!,
+            episodeUrl: ep.url,
+          );
+          if (videoSources.isNotEmpty) {
+            videoUrl = videoSources.first.url;
+          }
+        } else {
+          // JS Sample video source loading
+          final videoSources = await _extensionService.getVideoSources(ep.url);
+          if (videoSources.isNotEmpty) {
+            videoUrl = videoSources.first.url;
+          }
         }
       }
       if (!mounted) return;

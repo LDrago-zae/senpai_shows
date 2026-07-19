@@ -46,13 +46,25 @@ class _SourceDetailsScreenState extends State<SourceDetailsScreen> {
   Future<void> _fetchSourceData() async {
     setState(() => _isLoading = true);
     try {
-      await _extensionService.loadExtensionFromAssets('assets/extensions/sample_source.js');
       List<AnimeItem> fetchedItems;
-      if (widget.isManga) {
-        fetchedItems = await _extensionService.fetchPopularManga();
+
+      if (widget.source.id.isEmpty || widget.source.id == 'sample') {
+        // JS Sample fallback loading
+        await _extensionService.loadExtensionFromAssets('assets/extensions/sample_source.js');
+        if (widget.isManga) {
+          fetchedItems = await _extensionService.fetchPopularManga();
+        } else {
+          fetchedItems = await _extensionService.fetchPopular();
+        }
       } else {
-        fetchedItems = await _extensionService.fetchPopular();
+        // Native source loading from APK
+        fetchedItems = await _extensionService.fetchPopularNative(
+          sourceId: widget.source.id,
+          isManga: widget.isManga,
+          page: 1,
+        );
       }
+
       if (!mounted) return;
       setState(() {
         _items = fetchedItems;
@@ -193,34 +205,33 @@ class _SourceDetailsScreenState extends State<SourceDetailsScreen> {
     required Color activeColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? activeColor.withValues(alpha: 0.15) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isActive ? activeColor : Colors.white.withValues(alpha: 0.12),
-            width: 1,
+            color: isActive ? activeColor.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.08),
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 16,
-              color: isActive ? activeColor : Colors.white70,
+              size: 14,
+              color: isActive ? activeColor : Colors.white60,
             ),
             const SizedBox(width: 6),
             Text(
               label,
               style: GoogleFonts.urbanist(
-                color: isActive ? Colors.white : Colors.white70,
-                fontSize: 13,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                color: isActive ? activeColor : Colors.white60,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -231,13 +242,13 @@ class _SourceDetailsScreenState extends State<SourceDetailsScreen> {
 
   Widget _buildGridView(List<AnimeItem> items) {
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       physics: const BouncingScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        childAspectRatio: 0.68,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.7,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -422,6 +433,7 @@ class _SourceDetailsScreenState extends State<SourceDetailsScreen> {
           isFromExtension: true,
           contentUrl: item.url,
           sourceName: widget.source.name,
+          sourceId: widget.source.id,
         ),
       ),
     );

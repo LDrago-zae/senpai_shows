@@ -2,28 +2,24 @@ const source = {
     name: "Sample Source",
     baseUrl: "https://api.jikan.moe/v4",
     
-    fetchPopular: async function() {
-        // Hash the name to choose a unique genre (between 1 and 20)
-        let genreId = 1;
-        if (this.name) {
-            let hash = 0;
-            for (let i = 0; i < this.name.length; i++) {
-                hash = this.name.charCodeAt(i) + ((hash << 5) - hash);
+    // Called by Dart with pre-fetched data injected as __prefetchedBody
+    fetchPopular: function() {
+        try {
+            const data = JSON.parse(__prefetchedBody);
+            if (!data || !Array.isArray(data.data)) {
+                return JSON.stringify([]);
             }
-            genreId = Math.abs(hash % 20) + 1;
+            return JSON.stringify(data.data.map(item => ({
+                url: item.url,
+                title: item.title,
+                imageUrl: (item.images && item.images.jpg && item.images.jpg.large_image_url) || ""
+            })));
+        } catch (e) {
+            return JSON.stringify([]);
         }
-
-        // Fetch anime matching the selected genre ordered by popularity
-        const response = await httpClient.get(this.baseUrl + "/anime?genres=" + genreId + "&order_by=popularity&sort=desc");
-        const data = JSON.parse(response.body);
-        return JSON.stringify(data.data.map(item => ({
-            url: item.url,
-            title: item.title,
-            imageUrl: item.images.jpg.large_image_url
-        })));
     },
 
-    getEpisodes: async function(animeUrl) {
+    getEpisodes: function(animeUrl) {
         return JSON.stringify([
             { name: "Episode 1", url: animeUrl + "/episode/1" },
             { name: "Episode 2", url: animeUrl + "/episode/2" },
@@ -33,34 +29,30 @@ const source = {
         ]);
     },
 
-    getVideoSources: async function(episodeUrl) {
+    getVideoSources: function(episodeUrl) {
         return JSON.stringify([
             { quality: "Auto", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
         ]);
     },
 
-    fetchPopularManga: async function() {
-        // Hash the name to choose a unique genre (between 1 and 20)
-        let genreId = 1;
-        if (this.name) {
-            let hash = 0;
-            for (let i = 0; i < this.name.length; i++) {
-                hash = this.name.charCodeAt(i) + ((hash << 5) - hash);
+    // Called by Dart with pre-fetched data injected as __prefetchedBody
+    fetchPopularManga: function() {
+        try {
+            const data = JSON.parse(__prefetchedBody);
+            if (!data || !Array.isArray(data.data)) {
+                return JSON.stringify([]);
             }
-            genreId = Math.abs(hash % 20) + 1;
+            return JSON.stringify(data.data.map(item => ({
+                url: item.url,
+                title: item.title,
+                imageUrl: (item.images && item.images.jpg && item.images.jpg.large_image_url) || ""
+            })));
+        } catch (e) {
+            return JSON.stringify([]);
         }
-
-        // Fetch manga matching the selected genre ordered by popularity
-        const response = await httpClient.get(this.baseUrl + "/manga?genres=" + genreId + "&order_by=popularity&sort=desc");
-        const data = JSON.parse(response.body);
-        return JSON.stringify(data.data.map(item => ({
-            url: item.url,
-            title: item.title,
-            imageUrl: item.images.jpg.large_image_url
-        })));
     },
 
-    getMangaPages: async function(mangaUrl) {
+    getMangaPages: function(mangaUrl) {
         return JSON.stringify([
             { imageUrl: "https://picsum.photos/800/1200?random=1", index: 0 },
             { imageUrl: "https://picsum.photos/800/1200?random=2", index: 1 },

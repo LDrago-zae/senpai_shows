@@ -128,6 +128,18 @@ class ExtensionRuntime(private val context: Context) {
     return raw.split(';').map { it.trim() }.filter { it.isNotEmpty() }
   }
 
+  private fun instantiateClass(clazz: Class<*>): Any? {
+    return try {
+      clazz.getDeclaredConstructor().apply { isAccessible = true }.newInstance()
+    } catch (e: Throwable) {
+      try {
+        clazz.getField("INSTANCE").get(null)
+      } catch (e2: Throwable) {
+        null
+      }
+    }
+  }
+
   private fun loadSourceMetadata(apkFile: File, className: String): Map<String, Any> {
     val optimizedDir = File(context.codeCacheDir, "ext_dex")
     if (!optimizedDir.exists()) {
@@ -143,9 +155,16 @@ class ExtensionRuntime(private val context: Context) {
         context.classLoader
       )
       val clazz = Class.forName(className, false, classLoader)
-      val instance = clazz.getDeclaredConstructor().newInstance()
-      val name = tryInvokeString(instance, "getName") ?: className
-      val lang = tryInvokeString(instance, "getLang") ?: ""
+      val instance = instantiateClass(clazz) ?: throw Exception("Could not instantiate $className")
+      val createSourcesMethod = clazz.methods.firstOrNull { it.name == "createSources" }
+      val targetInstance = if (createSourcesMethod != null) {
+        (createSourcesMethod.invoke(instance) as? List<*>)?.firstOrNull() ?: instance
+      } else {
+        instance
+      }
+
+      val name = tryInvokeString(targetInstance, "getName") ?: tryInvokeString(targetInstance, "name") ?: className
+      val lang = tryInvokeString(targetInstance, "getLang") ?: tryInvokeString(targetInstance, "lang") ?: ""
 
       mapOf(
         "className" to className,
@@ -225,7 +244,12 @@ class ExtensionRuntime(private val context: Context) {
   private fun getSourceId(source: Any): Long? {
     return try {
       val method = source.javaClass.methods.firstOrNull { it.name == "getId" || it.name == "id" }
-      (method?.invoke(source) as? Number)?.toLong()
+      if (method != null) {
+        (method.invoke(source) as? Number)?.toLong()
+      } else {
+        val field = source.javaClass.fields.firstOrNull { it.name == "id" }
+        (field?.get(source) as? Number)?.toLong()
+      }
     } catch (e: Throwable) {
       null
     }
@@ -261,7 +285,7 @@ class ExtensionRuntime(private val context: Context) {
       for (className in classNames) {
         try {
           val clazz = Class.forName(className, false, classLoader)
-          val instance = clazz.getDeclaredConstructor().newInstance()
+          val instance = instantiateClass(clazz) ?: continue
           val createSourcesMethod = clazz.methods.firstOrNull { it.name == "createSources" }
           val sources = if (createSourcesMethod != null) {
             createSourcesMethod.invoke(instance) as? List<*> ?: emptyList<Any>()

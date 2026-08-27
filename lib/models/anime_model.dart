@@ -111,7 +111,10 @@ class Anime {
       json['status'] == 'anons' ? 'Not yet aired' : json['status'], // Map Shikimori status
       episodes: json['episodes'] is int ? json['episodes'] as int :
       json['episodes_aired'] is int ? json['episodes_aired'] as int : null,
-      rating: averageScore, // Or parse from 'score' if it's a simple average
+      rating: averageScore ??
+          ((json['score'] is num)
+              ? (json['score'] as num).toDouble()
+              : double.tryParse(json['score']?.toString() ?? '')),
       rank: json['ranked'] is int ? json['ranked'] as int : null, // Check actual key for rank
     );
   }

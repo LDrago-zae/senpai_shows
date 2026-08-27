@@ -92,7 +92,7 @@ class AniListApiService {
     const String query = r'''
       query ($page: Int, $perPage: Int) {
         Page(page: $page, perPage: $perPage) {
-          media(type: ANIME, sort: RECOMMENDED_DESC) {
+          media(type: ANIME, sort: TRENDING_DESC) {
             id
             title {
               romaji

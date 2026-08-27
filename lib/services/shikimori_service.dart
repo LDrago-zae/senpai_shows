@@ -122,7 +122,9 @@ class ShikimoriApiService {
                 item['image']?['original'] != null
                     ? 'https://shikimori.one${item['image']['original']}'
                     : 'https://via.placeholder.com/300x400',
-            rating: (item['score'] ?? 0.0).toDouble(),
+            rating: (item['score'] is num)
+                ? (item['score'] as num).toDouble()
+                : double.tryParse(item['score']?.toString() ?? '') ?? 0.0,
             episodes: item['episodes'],
             status: _mapShikimoriStatus(item['status']),
             synopsis: item['description'] ?? 'No synopsis available.',
@@ -193,7 +195,9 @@ class ShikimoriApiService {
                 item['image']?['original'] != null
                     ? 'https://shikimori.one${item['image']['original']}'
                     : 'https://via.placeholder.com/300x400',
-            rating: (item['score'] ?? 0.0).toDouble(),
+            rating: (item['score'] is num)
+                ? (item['score'] as num).toDouble()
+                : double.tryParse(item['score']?.toString() ?? '') ?? 0.0,
             episodes: item['episodes'],
             status: _mapShikimoriStatus(item['status']),
             synopsis: item['description'] ?? 'No synopsis available.',

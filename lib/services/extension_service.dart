@@ -71,7 +71,9 @@ class ExtensionService {
 
       if (response.statusCode != 200) {
         debugPrint('[ExtensionService] Non-200 response body: ${response.body.length > 200 ? response.body.substring(0, 200) : response.body}');
-        return '[]';
+        flutterJs.evaluate('var __prefetchedBody = null;');
+        final fallbackResult = flutterJs.evaluate(jsCall);
+        return fallbackResult.isError ? '[]' : fallbackResult.stringResult;
       }
 
       // Inject the fetched body into JS as a global variable
@@ -87,7 +89,9 @@ class ExtensionService {
       return result.stringResult;
     } catch (e) {
       debugPrint('[ExtensionService] Prefetch failed for $url: $e');
-      return '[]';
+      flutterJs.evaluate('var __prefetchedBody = null;');
+      final fallbackResult = flutterJs.evaluate(jsCall);
+      return fallbackResult.isError ? '[]' : fallbackResult.stringResult;
     }
   }
 
